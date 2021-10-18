@@ -28,7 +28,7 @@ class Menu < GTKObject
 
       if result
         @current_prompt = next_prompt
-      elsif inputs.keyboard.key_down.escape
+      elsif inputs.keyboard.key_down.escape || inputs.pointer.right_click
         previous_prompt&.then do |prompt|
           @current_prompt = prompt
         end || :done

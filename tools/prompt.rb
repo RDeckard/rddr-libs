@@ -56,7 +56,7 @@ class Prompt < GTKObject
 
     @last_value_size = @value.size
 
-    run_validation if inputs.keyboard.key_down.enter || inputs.mouse.click
+    @validation.call(@value) if inputs.keyboard.key_down.enter || inputs.pointer.left_click
   end
 
   def place!(x, y)
@@ -67,13 +67,6 @@ class Prompt < GTKObject
   end
 
   private
-
-  def run_validation
-    return true if @validation.call(@value)
-
-    @value = ""
-    false
-  end
 
   def run_continuous_action
     return unless @continuous_action

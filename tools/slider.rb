@@ -44,7 +44,7 @@ class Slider < GTKObject
   end
 
   def handler_inputs
-    if inputs.mouse.click && inputs.mouse.inside_rect?(@slide)
+    if inputs.pointer.left_click&.inside_rect?(@slide)
       gtk.hide_cursor
       inputs.mouse.x = @slide.x + @slide.w/2
       @grab_slider = true
@@ -55,7 +55,7 @@ class Slider < GTKObject
       @slide.x = @bar.left if @slide.x < @bar.left
       @slide.x = @bar.right - @slide.w if @slide.right > @bar.right
 
-      if inputs.mouse.click || inputs.mouse.moved
+      if inputs.pointer.left_click || inputs.mouse.moved
         yield @value_factor*(@slide.x - @bar.left) / (@bar.right - @slide.w - @bar.left) + @value_offset
       end
 
