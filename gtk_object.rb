@@ -1,4 +1,4 @@
-class GTKObject
+class RDDR::GTKObject
   attr_gtk
 
   def args

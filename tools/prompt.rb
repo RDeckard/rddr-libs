@@ -1,4 +1,4 @@
-class Prompt < GTKObject
+class RDDR::Prompt < RDDR::GTKObject
   CURSOR_BLINKS_PER_SEC = 2
   BACKSPACES_PER_SEC    = 10
 

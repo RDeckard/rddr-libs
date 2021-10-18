@@ -1,4 +1,4 @@
-class Slider < GTKObject
+class RDDR::Slider < RDDR::GTKObject
   attr_accessor :x, :y, :w, :h
   attr_reader   :bar, :slide
 

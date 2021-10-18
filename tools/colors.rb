@@ -1,4 +1,4 @@
-module Colors
+module RDDR::Colors
   SETS = {
     classic: {
       black:   { r: 0,   g: 0,   b: 0   }.freeze,

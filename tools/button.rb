@@ -1,4 +1,4 @@
-class Button < GTKObject
+class RDDR::Button < RDDR::GTKObject
   attr_accessor :x, :y, :w, :h
   attr_reader   :box
 

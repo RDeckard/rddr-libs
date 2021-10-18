@@ -1,4 +1,4 @@
-module Spriteable
+module RDDR::Spriteable
   DEFAULT_SPRITE = "pixel"
 
   def primitive_marker

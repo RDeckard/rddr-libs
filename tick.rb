@@ -1,4 +1,4 @@
-class Tick < GTKObject
+class RDDR::Tick < RDDR::GTKObject
   def initialize(first_scene, debug: false)
     @first_scene = first_scene
     @debug = debug

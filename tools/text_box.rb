@@ -1,4 +1,4 @@
-class TextBox < GTKObject
+class RDDR::TextBox < RDDR::GTKObject
   attr_reader :box, :text_lines
 
   def initialize(text_lines, text_size: 0, box_alignment: :center, box_alignment_v: :center, text_alignment: :left, offset: 5)
