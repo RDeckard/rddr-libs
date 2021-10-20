@@ -28,6 +28,6 @@ end
 
 class String
   def blank?
-    empty?
+    delete(" ").empty?
   end
 end

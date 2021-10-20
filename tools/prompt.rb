@@ -2,13 +2,13 @@ class RDDR::Prompt < RDDR::GTKObject
   CURSOR_BLINKS_PER_SEC = 2
   BACKSPACES_PER_SEC    = 10
 
-  attr_reader :updated_labels
+  attr_reader :updated_labels, :enable
 
-  def initialize(title: "", description: "", default_value: "", cursor: "_", size: 2, alignment: :center, validation: proc { true }, continuous_action: nil)
+  def initialize(title: "", description: "", default_value: "", size: 2, alignment: :center, validation: proc { true }, continuous_action: nil)
     @title             = title
     @description_lines = description.split("\n")
-    @value             = default_value
-    @cursor            = cursor
+    @value             = default_value.dup
+    @cursor            = "_"
 
     @size_enum      = size
     @alignment_enum = %i[left center right].index(alignment)
@@ -17,30 +17,41 @@ class RDDR::Prompt < RDDR::GTKObject
 
     @validation        = validation
     @continuous_action = continuous_action
+
+    enable!
   end
 
   def call
+    return unless @enable || !@render_in_disable_state
+
     @updated_labels = []
 
     @x += grid.right if @x.negative?
     @y += grid.top   if @y.negative?
 
-    backspace_handler
-    @value << inputs.text.join
+    if @enable
+      backspace_handler
+      @value << inputs.text.join
 
-    cursor_blink = cursor_blink?
+      cursor_blink = cursor_blink?
+    end
 
-    if @value.size != @last_value_size || cursor_blink
-      @cursor = @cursor == " " ? "_" : " " if cursor_blink
+    if @value.size != @last_value_size || cursor_blink || !@enable
+      if @enable
+        @cursor = @cursor == " " ? "_" : " " if cursor_blink
+        run_continuous_action
+        @render_in_disable_state = false
+      end
 
-      run_continuous_action
+      unless @render_in_disable_state
         @updated_labels << [
           {
             x: grid.left.shift_right(@x), y: grid.bottom.shift_up(@y),
             text: "#{@title} #{@value}#{@cursor}",
             size_enum: @size_enum,
-            alignment_enum: @alignment_enum
-          },
+            alignment_enum: @alignment_enum,
+            r: 0, g: 0, b: 0
+          }.label!,
           @description_lines.map.with_index do |description_line, line_number|
             line_number += 1
             {
@@ -49,14 +60,28 @@ class RDDR::Prompt < RDDR::GTKObject
               size_enum: @size_enum,
               alignment_enum: @alignment_enum,
               r: 128, g: 128, b: 128
-            }
+            }.label!
           end
         ]
+
+        unless @enable
+          @updated_labels.flatten.each do |updated_label|
+            updated_label.merge!(
+              r: updated_label.r + (255 - updated_label.r)/2,
+              g: updated_label.g + (255 - updated_label.g)/2,
+              b: updated_label.b + (255 - updated_label.b)/2
+            )
+          end
+
+          @render_in_disable_state = true
+        end
+      end
     end
 
-    @last_value_size = @value.size
-
-    @validation.call(@value) if inputs.keyboard.key_down.enter || inputs.pointer.left_click
+    if @enable
+      @last_value_size = @value.size
+      run_validation if inputs.keyboard.key_down.enter || inputs.pointer.left_click
+    end
   end
 
   def place!(x, y)
@@ -64,6 +89,19 @@ class RDDR::Prompt < RDDR::GTKObject
     @y = y
 
     self
+  end
+
+  def enable!
+    @enable = true
+  end
+
+  def disable!
+    @cursor = " "
+    @enable = false
+  end
+
+  def run_validation
+    @validation.call(@value.tap(&:strip!))
   end
 
   private

@@ -1,13 +1,14 @@
 require "lib/rddr-libs/rddr.rb"
 
-# Patches
-require "lib/rddr-libs/monkey_patches/gtk_inputs.rb"
-require "lib/rddr-libs/monkey_patches/mruby.rb"
-
 # Base
+require "lib/rddr-libs/serializable.rb"
 require "lib/rddr-libs/gtk_object.rb"
 require "lib/rddr-libs/spriteable.rb"
 require "lib/rddr-libs/tick.rb"
+
+# Patches
+require "lib/rddr-libs/monkey_patches/gtk_inputs.rb"
+require "lib/rddr-libs/monkey_patches/mruby.rb"
 
 # Tools
 require "lib/rddr-libs/tools/button.rb"
