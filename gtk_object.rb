@@ -1,5 +1,5 @@
 class RDDR::GTKObject
-  include Serializable
+  include RDDR::Serializable
 
   attr_gtk
 

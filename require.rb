@@ -13,7 +13,7 @@ require "lib/rddr-libs/monkey_patches/mruby.rb"
 # Tools
 require "lib/rddr-libs/tools/button.rb"
 require "lib/rddr-libs/tools/colors.rb"
-require "lib/rddr-libs/tools/menu.rb"
+require "lib/rddr-libs/tools/text_inputs.rb"
 require "lib/rddr-libs/tools/prompt.rb"
 require "lib/rddr-libs/tools/slider.rb"
 require "lib/rddr-libs/tools/text_box.rb"

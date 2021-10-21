@@ -7,7 +7,7 @@ class RDDR::Prompt < RDDR::GTKObject
   def initialize(title: "", description: "", default_value: "", size: 2, alignment: :center, validation: proc { true }, continuous_action: nil)
     @title             = title
     @description_lines = description.split("\n")
-    @value             = default_value.dup
+    @value             = default_value.to_s.dup
     @cursor            = "_"
 
     @size_enum      = size
@@ -25,9 +25,6 @@ class RDDR::Prompt < RDDR::GTKObject
     return unless @enable || !@render_in_disable_state
 
     @updated_labels = []
-
-    @x += grid.right if @x.negative?
-    @y += grid.top   if @y.negative?
 
     if @enable
       backspace_handler

@@ -14,7 +14,7 @@ end
 
 module Enumerable
   def sum(&block)
-    map(&block).reduce(0) { |acc, element| acc += element }
+    filter_map(&block).reduce(0) { |acc, element| acc += element }
   end
 
   def blank?

@@ -1,8 +1,8 @@
-class RDDR::Menu < RDDR::GTKObject
-  def initialize(prompts:, inside_rect: nil, mode: :sequential)
+class RDDR::TextInputs < RDDR::GTKObject
+  def initialize(prompts:, frame_rect: nil, mode: :sequential)
     @prompts = prompts
 
-    @inside_rect = inside_rect || grid.rect
+    @frame_rect = frame_rect || grid.rect
     @mode = mode
   end
 
@@ -86,6 +86,6 @@ class RDDR::Menu < RDDR::GTKObject
   end
 
   def compute_line_center(n = 1, total: 1)
-    [@inside_rect.x + @inside_rect.w/2, @inside_rect.top - n*@inside_rect.h/(total+1)]
+    [@frame_rect.left + @frame_rect.w/2, @frame_rect.top - n*@frame_rect.h/(total+1)]
   end
 end
