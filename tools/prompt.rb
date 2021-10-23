@@ -43,7 +43,7 @@ class RDDR::Prompt < RDDR::GTKObject
       unless @render_in_disable_state
         @updated_labels << [
           {
-            x: grid.left.shift_right(@x), y: grid.bottom.shift_up(@y),
+            x: @x, y: @y,
             text: "#{@title} #{@value}#{@cursor}",
             size_enum: @size_enum,
             alignment_enum: @alignment_enum,
@@ -52,7 +52,7 @@ class RDDR::Prompt < RDDR::GTKObject
           @description_lines.map.with_index do |description_line, line_number|
             line_number += 1
             {
-              x: grid.left.shift_right(@x), y: grid.bottom.shift_up(@y + @line_height * (@description_lines.count - line_number + 1)),
+              x: @x, y: @y + @line_height * (@description_lines.count - line_number + 1),
               text: "#{description_line}",
               size_enum: @size_enum,
               alignment_enum: @alignment_enum,
@@ -113,7 +113,7 @@ class RDDR::Prompt < RDDR::GTKObject
     return if text.to_s.empty?
 
     @updated_labels << {
-      x: grid.left.shift_right(@x), y: grid.bottom.shift_up(@y - @line_height),
+      x: @x, y: @y - @line_height,
       text: text,
       size_enum: 1,
       alignment_enum: 1,

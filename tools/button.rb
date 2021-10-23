@@ -1,6 +1,6 @@
 class RDDR::Button < RDDR::GTKObject
   attr_accessor :x, :y, :w, :h
-  attr_reader   :box
+  attr_reader   :frame
 
   def initialize(x: 0, y: 0, w:, h: 0, text: nil, text_size: 1)
     @x = x
@@ -17,20 +17,15 @@ class RDDR::Button < RDDR::GTKObject
     primitives
   end
 
-  def primitive_marker
-    :solid
-  end
-
   def primitives
     primitives = []
 
-      # Box for the slide
-    @box = { x: @x, y: @y, w: @w, h: @h }.solid!(r: 192, g: 192, b: 192)
-    primitives << @box
+    @frame = { x: @x, y: @y, w: @w, h: @h }
+    primitives << RDDR::Frame.new(@frame, background_color: :silver).primitives
 
     if @text
       @label = { text: @text, size_enum: @text_size, r: 128, g: 128, b: 128 }.label!(@text_rect)
-      @label.merge!(geometry.center_inside_rect(@label, @box)).merge!(y: @label.top)
+      @label.merge!(geometry.center_inside_rect(@label, @frame)).merge!(y: @label.top)
       primitives << @label
     end
 
@@ -38,10 +33,10 @@ class RDDR::Button < RDDR::GTKObject
   end
 
   def handler_inputs
-    yield if inputs.mouse.up&.inside_rect?(@box)
+    yield if inputs.mouse.up&.inside_rect?(@frame)
 
     # TO TEST
-    if inputs.finger_one&.inside_rect?(@box)
+    if inputs.finger_one&.inside_rect?(@frame)
       @touch = true
     elsif @touch && inputs.finger_one.nil?
       yield

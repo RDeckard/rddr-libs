@@ -1,9 +1,12 @@
 class RDDR::TextInputs < RDDR::GTKObject
-  def initialize(prompts:, frame_rect: nil, mode: :sequential)
-    @prompts = prompts
+  def initialize(prompts:, frame_rect: nil, frame_thickness: 5, mode: :sequential)
+    @prompts         = prompts
+    @frame_rect      = frame_rect
+    @frame_thickness = frame_thickness
+    @mode            = mode
 
-    @frame_rect = frame_rect || grid.rect
-    @mode = mode
+    @updated_primitives = []
+    @static_primitives  = []
   end
 
   def call
@@ -13,19 +16,11 @@ class RDDR::TextInputs < RDDR::GTKObject
     end
   end
 
-  def updated_labels
-    @updated_labels.flatten
-  end
-
-  def static_labels
-    @static_labels.flatten
-  end
-
   def flat_tick
     @active_prompt_index ||= 0
 
-    @updated_labels = []
-    @static_labels = []
+    @updated_primitives = []
+    @static_primitives  = []
 
     @prompts.each_with_index do |prompt, i|
       i == @active_prompt_index ? prompt.enable! : prompt.disable!
@@ -34,9 +29,9 @@ class RDDR::TextInputs < RDDR::GTKObject
       prompt.place!(*center).call
 
       if prompt.enable
-        @updated_labels << prompt.updated_labels
+        @updated_primitives << prompt.updated_labels
       else
-        @static_labels << prompt.updated_labels
+        @static_primitives << prompt.updated_labels
       end
     end
 
@@ -46,7 +41,11 @@ class RDDR::TextInputs < RDDR::GTKObject
     if inputs.keyboard.key_down.enter || inputs.pointer.left_click
       @active_prompt_index += 1 if @prompts[@active_prompt_index].run_validation
 
-      return :done if @active_prompt_index >= @prompts.count && @prompts.all?(&:run_validation)
+      if @active_prompt_index >= @prompts.count && @prompts.all?(&:run_validation)
+        return :done
+      else
+        return :new_field
+      end
     end
 
     @active_prompt_index = 0 if @active_prompt_index >= @prompts.count
@@ -59,7 +58,7 @@ class RDDR::TextInputs < RDDR::GTKObject
     if @current_prompt
       result = @current_prompt.call
 
-      @updated_labels = @current_prompt.updated_labels
+      @updated_primitives = @current_prompt.updated_labels
 
       if result
         @current_prompt = next_prompt
@@ -86,6 +85,26 @@ class RDDR::TextInputs < RDDR::GTKObject
   end
 
   def compute_line_center(n = 1, total: 1)
-    [@frame_rect.left + @frame_rect.w/2, @frame_rect.top - n*@frame_rect.h/(total+1)]
+    @compute_line_center_frame = @frame_rect || grid.rect
+
+    [@compute_line_center_frame.left + @compute_line_center_frame.w/2,
+     @compute_line_center_frame.top - n*@compute_line_center_frame.h/(total+1)]
+  end
+
+  def primitives
+    (frame_primitives + @static_primitives + @updated_primitives).tap(&:flatten!)
+  end
+
+  def updated?
+    @updated_primitives.flatten.any?
+  end
+
+  def frame_primitives
+    @frame_primitives ||=
+      if @frame_rect
+        RDDR::Frame.new(@frame_rect, frame_thickness: 5, background_color: :silver).primitives
+      else
+        []
+      end
   end
 end
