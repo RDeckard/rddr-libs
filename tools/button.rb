@@ -33,15 +33,14 @@ class RDDR::Button < RDDR::GTKObject
   end
 
   def handler_inputs
-    yield if inputs.mouse.up&.inside_rect?(@frame)
-
-    # TO TEST
-    if inputs.finger_one&.inside_rect?(@frame)
-      @touch = true
-    elsif @touch && inputs.finger_one.nil?
-      yield
+    if inputs.pointer.inside_rect?(@frame)
+      if inputs.pointer.left_click
+        @clicked = true
+      elsif inputs.mouse.up && @clicked
+        yield
+      end
     else
-      @touch = false
+      @clicked = false
     end
   end
 end

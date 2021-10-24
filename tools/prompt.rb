@@ -13,7 +13,7 @@ class RDDR::Prompt < RDDR::GTKObject
     @size_enum      = size
     @alignment_enum = %i[left center right].index(alignment)
 
-    _, @line_height = gtk.calcstringbox("text", @size_enum)
+    @character_width, @line_height = gtk.calcstringbox("x", @size_enum)
 
     @validation        = validation
     @continuous_action = continuous_action
@@ -21,7 +21,7 @@ class RDDR::Prompt < RDDR::GTKObject
     enable!
   end
 
-  def call
+  def call(frame_width = grid.w)
     return unless @enable || !@render_in_disable_state
 
     @updated_labels = []
@@ -41,16 +41,26 @@ class RDDR::Prompt < RDDR::GTKObject
       end
 
       unless @render_in_disable_state
+        wrap_description_lines!(frame_width)
+        @field_lines =
+          RDDR.wrapped_lines("#{@title} #{@value}", @max_chars_by_line - 1, keep_last_spaces: true)
+
         @updated_labels << [
-          {
-            x: @x, y: @y,
-            text: "#{@title} #{@value}#{@cursor}",
-            size_enum: @size_enum,
-            alignment_enum: @alignment_enum,
-            r: 0, g: 0, b: 0
-          }.label!,
+          @field_lines.map.with_index do |field_line, line_number|
+            line_number += 1
+            field_line.concat(@cursor) if line_number == @field_lines.count
+
+            {
+              x: @x, y: @y - @line_height * (line_number - 1),
+              text: field_line,
+              size_enum: @size_enum,
+              alignment_enum: @alignment_enum,
+              r: 0, g: 0, b: 0
+            }.label!
+          end,
           @description_lines.map.with_index do |description_line, line_number|
             line_number += 1
+
             {
               x: @x, y: @y + @line_height * (@description_lines.count - line_number + 1),
               text: "#{description_line}",
@@ -97,6 +107,15 @@ class RDDR::Prompt < RDDR::GTKObject
     @enable = false
   end
 
+  def wrap_description_lines!(frame_width)
+    return if @frame_width == frame_width
+
+    @max_chars_by_line = (frame_width / @character_width).to_i
+    @description_lines = RDDR.wrapped_lines(@description_lines, @max_chars_by_line)
+
+    @frame_width = frame_width
+  end
+
   def run_validation
     @validation.call(@value.tap(&:strip!))
   end
@@ -112,14 +131,20 @@ class RDDR::Prompt < RDDR::GTKObject
 
     return if text.to_s.empty?
 
-    @updated_labels << {
-      x: @x, y: @y - @line_height,
-      text: text,
-      size_enum: 1,
-      alignment_enum: 1,
-    }.label!.tap do |label|
-      label.merge!(r: 255, g: 0, b: 0) unless valid
-    end
+    text_lines = RDDR.wrapped_lines(text, @max_chars_by_line)
+
+    @updated_labels <<
+      text_lines.map.with_index do |text_line, line_number|
+        line_number += 1
+        {
+          x: @x, y: @y - @line_height * (line_number + (@field_lines&.count || 1) - 1),
+          text: text,
+          size_enum: 1,
+          alignment_enum: 1,
+        }.label!.tap do |label|
+          label.merge!(r: 255, g: 0, b: 0) unless valid
+        end
+      end
   end
 
   def cursor_blink?

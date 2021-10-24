@@ -1,5 +1,5 @@
 class RDDR::TextInputs < RDDR::GTKObject
-  def initialize(prompts:, frame_rect: nil, frame_thickness: 5, mode: :sequential)
+  def initialize(prompts:, frame_rect: grid.rect, frame_thickness: nil, mode: :sequential)
     @prompts         = prompts
     @frame_rect      = frame_rect
     @frame_thickness = frame_thickness
@@ -26,7 +26,7 @@ class RDDR::TextInputs < RDDR::GTKObject
       i == @active_prompt_index ? prompt.enable! : prompt.disable!
 
       center = compute_line_center(i+1, total: @prompts.count)
-      prompt.place!(*center).call
+      prompt.place!(*center).call(@frame_rect.w)
 
       if prompt.enable
         @updated_primitives << prompt.updated_labels
@@ -56,7 +56,7 @@ class RDDR::TextInputs < RDDR::GTKObject
     @current_prompt ||= next_prompt
 
     if @current_prompt
-      result = @current_prompt.call
+      result = @current_prompt.call(@frame_rect.w)
 
       @updated_primitives = @current_prompt.updated_labels
 
@@ -85,7 +85,7 @@ class RDDR::TextInputs < RDDR::GTKObject
   end
 
   def compute_line_center(n = 1, total: 1)
-    @compute_line_center_frame = @frame_rect || grid.rect
+    @compute_line_center_frame = @frame_rect
 
     [@compute_line_center_frame.left + @compute_line_center_frame.w/2,
      @compute_line_center_frame.top - n*@compute_line_center_frame.h/(total+1)]
@@ -101,8 +101,8 @@ class RDDR::TextInputs < RDDR::GTKObject
 
   def frame_primitives
     @frame_primitives ||=
-      if @frame_rect
-        RDDR::Frame.new(@frame_rect, frame_thickness: 5, background_color: :silver).primitives
+      if @frame_thickness
+        RDDR::Frame.new(@frame_rect, frame_thickness: @frame_thickness, background_color: :silver).primitives
       else
         []
       end

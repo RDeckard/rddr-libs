@@ -1,7 +1,7 @@
 class Frame
-  def initialize(frame_rect, frame_thickness: 1, background_color: %i[classic white], border_color: %i[classic black])
-    @frame_rect       = frame_rect.dup
-    @frame_thickness  = frame_thickness
+  def initialize(rect, frame_thickness: 1, background_color: %i[classic white], border_color: %i[classic black])
+    @rect = rect.dup
+    @frame_thickness = frame_thickness
 
     background_color  = [:classic, background_color] unless background_color.is_a?(Array)
     @background_color = RDDR::Colors::SETS.dig(*background_color)
@@ -14,16 +14,16 @@ class Frame
     @primitives ||=
       case @frame_thickness
       when 0
-        [@frame_rect.solid!(@background_color)]
+        [@rect.solid!(@background_color)]
       when 1
-        [@frame_rect.merge(@background_color).solid!, @frame_rect.border!(@border_color)]
+        [@rect.merge(@background_color).solid!, @rect.border!(@border_color)]
       else
         [
-          @frame_rect.solid!(@background_color),
-          { x: @frame_rect.left,  y: @frame_rect.bottom, w: @frame_thickness,  h: @frame_rect.h     }.solid!(@border_color),
-          { x: @frame_rect.left,  y: @frame_rect.top,    w: @frame_rect.w,     h: -@frame_thickness }.solid!(@border_color),
-          { x: @frame_rect.right, y: @frame_rect.top,    w: -@frame_thickness, h: -@frame_rect.h    }.solid!(@border_color),
-          { x: @frame_rect.right, y: @frame_rect.bottom, w: -@frame_rect.w,    h: @frame_thickness  }.solid!(@border_color)
+          @rect.solid!(@background_color),
+          { x: @rect.left,  y: @rect.bottom, w: @frame_thickness,  h: @rect.h           }.solid!(@border_color),
+          { x: @rect.left,  y: @rect.top,    w: @rect.w,           h: -@frame_thickness }.solid!(@border_color),
+          { x: @rect.right, y: @rect.top,    w: -@frame_thickness, h: -@rect.h          }.solid!(@border_color),
+          { x: @rect.right, y: @rect.bottom, w: -@rect.w,          h: @frame_thickness  }.solid!(@border_color)
         ]
       end
   end

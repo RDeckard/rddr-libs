@@ -15,6 +15,10 @@ module RDDR::Pointer
     $gtk.args.state
   end
 
+  def inside_rect?(rect)
+    inputs.mouse&.inside_rect?(rect) || inputs.finger_one&.inside_rect?(rect)
+  end
+
   def left_click
     mouse_left_click || touch_left_click
   end
