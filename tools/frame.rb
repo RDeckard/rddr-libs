@@ -1,4 +1,6 @@
 class Frame
+  attr_reader :rect
+
   def initialize(rect, frame_thickness: 1, background_color: %i[classic white], border_color: %i[classic black])
     @rect = rect.dup
     @frame_thickness = frame_thickness

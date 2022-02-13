@@ -12,13 +12,6 @@ class RDDR::Tick < RDDR::GTKObject
     state.current_scene.tick
 
     handle_quit_and_reset
-  rescue => e
-    # HOTFIX DragonRuby: raise exception correctly when using blocks/procs/lambdas
-    puts "+-" * 50
-    puts e
-    puts e.backtrace.join("\n")
-    puts "+-" * 50
-    raise e
   end
 
   def handle_quit_and_reset

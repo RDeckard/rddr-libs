@@ -5,6 +5,18 @@ module RDDR::Spriteable
     :sprite
   end
 
+  def rect
+    { x: x, y: y, w: w, h: h }
+  end
+
+  def merge!(**attributes)
+    attributes.each do |attribute, value|
+      send("#{attribute}=", value)
+    end
+
+    self
+  end
+
   def draw_override(ffi_draw)
     params = draw_parameters
 
