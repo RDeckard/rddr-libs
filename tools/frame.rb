@@ -1,4 +1,4 @@
-class Frame
+class Frame < RDDR::GTKObject
   attr_reader :rect
 
   def initialize(rect, frame_thickness: 1, background_color: %i[classic white], border_color: %i[classic black])
