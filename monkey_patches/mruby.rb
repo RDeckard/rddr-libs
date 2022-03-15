@@ -10,6 +10,10 @@ class Object
   def presence
     self if present?
   end
+
+  def in?(collection)
+    collection.include?(self)
+  end
 end
 
 module Enumerable

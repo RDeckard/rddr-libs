@@ -5,6 +5,23 @@ module RDDR::Spriteable
     :sprite
   end
 
+  # Warning: this matches well only with square rotated sprites
+  def rect
+    if (90 - angle % 180).abs < 45 # closer to "right" or "left" orientation (angle of 90 or 270 degrees)
+      { x: x.shift_left(CE.card_model.rotation_offset), y: y.shift_up(CE.card_model.rotation_offset), w: h, h: w }
+    else # closer to "up" or "down" orientation (angle of 0 or 180 degrees)
+      { x: x, y: y, w: w, h: h }
+    end
+  end
+
+  def merge!(**attributes)
+    attributes.each do |attribute, value|
+      send("#{attribute}=", value)
+    end
+
+    self
+  end
+
   def draw_override(ffi_draw)
     params = draw_parameters
 

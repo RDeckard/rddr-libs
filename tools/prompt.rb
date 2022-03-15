@@ -24,6 +24,8 @@ class RDDR::Prompt < RDDR::GTKObject
   def call(frame_width = grid.w)
     return unless @enable || !@render_in_disable_state
 
+    wrap_description_lines!(frame_width)
+
     @updated_labels = []
 
     if @enable
@@ -41,7 +43,6 @@ class RDDR::Prompt < RDDR::GTKObject
       end
 
       unless @render_in_disable_state
-        wrap_description_lines!(frame_width)
         @field_lines =
           RDDR.wrapped_lines("#{@title} #{@value}", @max_chars_by_line - 1, keep_last_spaces: true)
 
