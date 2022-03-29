@@ -63,7 +63,7 @@ class RDDR::Prompt < RDDR::GTKObject
             line_number += 1
 
             {
-              x: @x, y: @y + @line_height * (@description_lines.count - line_number + 1),
+              x: @x, y: @y + @line_height * (@description_lines.count - line_number.next),
               text: "#{description_line}",
               size_enum: @size_enum,
               alignment_enum: @alignment_enum,

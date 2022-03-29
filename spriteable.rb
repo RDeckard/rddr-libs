@@ -8,10 +8,16 @@ module RDDR::Spriteable
   # Warning: this matches well only with square rotated sprites (even with after_rotation == true)
   def rect(after_rotation: false)
     if after_rotation && (90 - angle % 180).abs < 45 # closer to the "left" or "right" orientations (angle of 90 or 270 degrees)
+      rotation_offset = rotation_offset()
+
       { x: x.shift_left(rotation_offset), y: y.shift_up(rotation_offset), w: h, h: w }
     else # closer to the "up" or "down" orientations (angle of 0 or 180 degrees)
       { x: x, y: y, w: w, h: h }
     end
+  end
+
+  def rotation_offset
+    (w - h).abs / 2
   end
 
   # Returns the 4 corners of the sprite as points (taking in account any rotation)
@@ -27,7 +33,7 @@ module RDDR::Spriteable
         { x: rect.x,          y: rect.y + rect.h }
       ]
     else
-      rotation_center = rotation_center() # temporary memöization
+      rotation_center = rotation_center() # temporary memoization
 
       [
         { x: x,     y: y },
@@ -71,7 +77,7 @@ module RDDR::Spriteable
 
   # non relative rotation center (angle_anchor_x and angle_anchor_y are relative)
   def rotation_center
-    { x: x + w*angle_anchor.x, y: y + h*angle_anchor.y }
+    { x: x + w * angle_anchor.x, y: y + h * angle_anchor.y }
   end
 
   def merge!(**attributes)

@@ -1,13 +1,13 @@
 class RDDR::Tick < RDDR::GTKObject
-  def initialize(first_scene, debug: false)
+  def initialize(first_scene, debug_mode: false)
     @first_scene = first_scene
-    @debug = debug
+    @debug_mode = debug_mode
   end
 
   def call
-    debug if @debug
+    debug! if @debug_mode
 
-    args.state.current_scene ||= @first_scene.new
+    state.current_scene ||= @first_scene.new
 
     state.current_scene.tick
 
@@ -28,7 +28,9 @@ class RDDR::Tick < RDDR::GTKObject
     gtk.reset if inputs.keyboard.key_held.alt && inputs.keyboard.key_down.r
   end
 
-  def debug
+  def debug!
+    state.rddr_debug_mode ||= true
+
     if @last_tick_time
       now = Time.now.to_f
       tps = 1/(now - @last_tick_time)
@@ -51,6 +53,7 @@ class RDDR::Tick < RDDR::GTKObject
         @last_print_time = Time.now.to_f
       end
     end
+
     @last_tick_time = Time.now.to_f
   end
 end
