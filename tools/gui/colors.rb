@@ -10,7 +10,7 @@ module RDDR::Colors
       cyan:    { r: 0,   g: 255, b: 255 }.freeze,
       magenta: { r: 255, g: 0,   b: 255 }.freeze,
       silver:  { r: 192, g: 192, b: 192 }.freeze,
-      gray:    { r: 128, g: 128, b: 128 }.freeze,
+      grey:    { r: 128, g: 128, b: 128 }.freeze,
       maroon:  { r: 128, g: 0,   b: 0   }.freeze,
       olive:   { r: 128, g: 128, b: 0   }.freeze,
       green:   { r: 0,   g: 128, b: 0   }.freeze,
