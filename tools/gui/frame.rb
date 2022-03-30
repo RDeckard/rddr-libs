@@ -3,15 +3,18 @@ class Frame < RDDR::GTKObject
 
   attr_reader :rect, :sprite_path, :angle
 
-  def initialize(rect, frame_thickness: 1, background_color: %i[classic white], border_color: %i[classic black], sprite_path: nil, angle: 0)
+  def initialize(rect, frame_thickness: nil, background_color: nil, border_color: nil, sprite_path: nil, angle: 0)
     @rect = rect.dup
-    @frame_thickness = frame_thickness
 
-    background_color  = [:classic, background_color] unless background_color.is_a?(Array)
-    @background_color = RDDR::Colors::SETS.dig(*background_color)
+    @frame_thickness  = frame_thickness  || 1
+    @background_color = background_color || %i[classic white]
+    @border_color     = border_color     || %i[classic black]
 
-    border_color  = [:classic, border_color] unless border_color.is_a?(Array)
-    @border_color = RDDR::Colors::SETS.dig(*border_color)
+    @background_color = [:classic, @background_color] unless @background_color.is_a?(Array)
+    @background_color = RDDR::Colors::SETS.dig(*@background_color)
+
+    @border_color = [:classic, @border_color] unless @border_color.is_a?(Array)
+    @border_color = RDDR::Colors::SETS.dig(*@border_color)
 
     @sprite_path = sprite_path
     @angle       = angle
