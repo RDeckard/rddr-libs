@@ -43,7 +43,7 @@ class RDDR::Slider < RDDR::GTKObject
     primitives
   end
 
-  def handler_inputs
+  def handle_inputs
     if inputs.pointer.left_click&.inside_rect?(@slide)
       gtk.hide_cursor
       inputs.mouse.x = @slide.x + @slide.w/2

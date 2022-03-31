@@ -1,6 +1,6 @@
 class RDDR::Button < RDDR::GTKObject
   attr_accessor :x, :y, :w, :h
-  attr_reader   :frame
+  attr_reader   :rect
 
   def initialize(x: 0, y: 0, w:, h: 0, text: nil, text_size: 1)
     @x = x
@@ -20,20 +20,20 @@ class RDDR::Button < RDDR::GTKObject
   def primitives
     primitives = []
 
-    @frame = { x: @x, y: @y, w: @w, h: @h }
-    primitives << RDDR::Frame.new(@frame, background_color: :silver).primitives
+    @rect = { x: @x, y: @y, w: @w, h: @h }
+    primitives << RDDR::Box.new(@rect, background_color: :silver).primitives
 
     if @text
       @label = { text: @text, size_enum: @text_size, r: 128, g: 128, b: 128 }.label!(@text_rect)
-      @label.merge!(geometry.center_inside_rect(@label, @frame)).merge!(y: @label.top)
+      @label.merge!(geometry.center_inside_rect(@label, @rect)).merge!(y: @label.top)
       primitives << @label
     end
 
     primitives
   end
 
-  def handler_inputs
-    if inputs.pointer.inside_rect?(@frame)
+  def handle_inputs
+    if inputs.pointer.inside_rect?(@rect)
       if inputs.pointer.left_click
         @clicked = true
       elsif inputs.mouse.up && @clicked

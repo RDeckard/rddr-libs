@@ -1,9 +1,9 @@
 class RDDR::TextInputs < RDDR::GTKObject
-  def initialize(prompts:, frame_rect: grid.rect, frame_thickness: nil, mode: :sequential)
-    @prompts         = prompts
-    @frame_rect      = frame_rect
-    @frame_thickness = frame_thickness
-    @mode            = mode
+  def initialize(prompts:, box_rect: grid.rect, border_thickness: nil, mode: :sequential)
+    @prompts          = prompts
+    @box_rect         = box_rect
+    @border_thickness = border_thickness
+    @mode             = mode
 
     @updated_primitives = []
     @static_primitives  = []
@@ -26,7 +26,7 @@ class RDDR::TextInputs < RDDR::GTKObject
       i == @active_prompt_index ? prompt.enable! : prompt.disable!
 
       center = compute_line_center(i+1, total: @prompts.count)
-      prompt.place!(*center).call(@frame_rect.w)
+      prompt.place!(*center).call(@box_rect.w)
 
       if prompt.enable
         @updated_primitives << prompt.updated_labels
@@ -56,7 +56,7 @@ class RDDR::TextInputs < RDDR::GTKObject
     @current_prompt ||= next_prompt
 
     if @current_prompt
-      result = @current_prompt.call(@frame_rect.w)
+      result = @current_prompt.call(@box_rect.w)
 
       @updated_primitives = @current_prompt.updated_labels
 
@@ -85,24 +85,24 @@ class RDDR::TextInputs < RDDR::GTKObject
   end
 
   def compute_line_center(n = 1, total: 1)
-    @compute_line_center_frame = @frame_rect
+    @compute_line_center_box = @box_rect
 
-    [@compute_line_center_frame.left + @compute_line_center_frame.w/2,
-     @compute_line_center_frame.top - n*@compute_line_center_frame.h/(total+1)]
+    [@compute_line_center_box.left + @compute_line_center_box.w/2,
+     @compute_line_center_box.top - n*@compute_line_center_box.h/(total+1)]
   end
 
   def primitives
-    (frame_primitives + @static_primitives + @updated_primitives).tap(&:flatten!)
+    (box_primitives + @static_primitives + @updated_primitives).tap(&:flatten!)
   end
 
   def updated?
     @updated_primitives.flatten.any?
   end
 
-  def frame_primitives
-    @frame_primitives ||=
-      if @frame_thickness
-        RDDR::Frame.new(@frame_rect, frame_thickness: @frame_thickness, background_color: :silver).primitives
+  def box_primitives
+    @box_primitives ||=
+      if @border_thickness
+        RDDR::Box.new(@box_rect, border_thickness: @border_thickness, background_color: :silver).primitives
       else
         []
       end

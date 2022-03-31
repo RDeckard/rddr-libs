@@ -16,7 +16,11 @@ module RDDR::Validable
           when String
             error_message
           when nil
-            "'#{object.__send__(attribute)}' is not permitted"
+            if object.respond_to?(attribute)
+              "'#{object.__send__(attribute)}' is not permitted"
+            else
+              "'#{attribute}' is not valid"
+            end
           end
         end
       end

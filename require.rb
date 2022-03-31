@@ -11,7 +11,7 @@ require "lib/rddr-libs/monkey_patches/gtk_inputs.rb"
 require "lib/rddr-libs/monkey_patches/mruby.rb"
 
 # Tools
-require "lib/rddr-libs/tools/gui/frame.rb"
+require "lib/rddr-libs/tools/gui/box.rb"
 require "lib/rddr-libs/tools/gui/button.rb"
 require "lib/rddr-libs/tools/gui/colors.rb"
 require "lib/rddr-libs/tools/gui/text_inputs.rb"

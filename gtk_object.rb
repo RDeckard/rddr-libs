@@ -6,4 +6,10 @@ class RDDR::GTKObject
   def args
     $gtk.args
   end
+
+  def debug_puts(...)
+    return unless state.rddr_debug_mode
+
+    puts(...)
+  end
 end

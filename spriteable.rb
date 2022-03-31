@@ -6,7 +6,7 @@ module RDDR::Spriteable
   end
 
   # Warning: this matches well only with square rotated sprites (even with after_rotation == true)
-  def rect(after_rotation: false)
+  def shape_rect(after_rotation: false)
     if after_rotation && (90 - angle % 180).abs < 45 # closer to the "left" or "right" orientations (angle of 90 or 270 degrees)
       rotation_offset = rotation_offset()
 
@@ -24,13 +24,13 @@ module RDDR::Spriteable
   def shape_corners
     if (angle % 90).round(3).zero?
       # Square rotation cases optimization
-      rect = rect(after_rotation: true)
+      shape_rect = shape_rect(after_rotation: true)
 
       [
-        { x: rect.x,          y: rect.y },
-        { x: rect.x + rect.w, y: rect.y },
-        { x: rect.x + rect.w, y: rect.y + rect.h },
-        { x: rect.x,          y: rect.y + rect.h }
+        { x: shape_rect.x,          y: shape_rect.y },
+        { x: shape_rect.x + shape_rect.w, y: shape_rect.y },
+        { x: shape_rect.x + shape_rect.w, y: shape_rect.y + shape_rect.h },
+        { x: shape_rect.x,          y: shape_rect.y + shape_rect.h }
       ]
     else
       rotation_center = rotation_center() # temporary memoization
@@ -60,7 +60,7 @@ module RDDR::Spriteable
   def contains_point?(point)
     if (angle % 90).round(3).zero?
       # Square rotation cases optimization
-      point.inside_rect?(rect(after_rotation: true))
+      point.inside_rect?(shape_rect(after_rotation: true))
     else
       # Interesting point: this clause wouldn't work with square rotation cases! (ray_tests :left or :right is arbitrary with straight lines)
       shape_lines.

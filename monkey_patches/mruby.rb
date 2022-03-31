@@ -34,4 +34,12 @@ class String
   def blank?
     delete(" ").empty?
   end
+
+  def first
+    self[0]
+  end
+
+  def last
+    self[-1]
+  end
 end

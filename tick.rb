@@ -1,11 +1,12 @@
 class RDDR::Tick < RDDR::GTKObject
   def initialize(first_scene, debug_mode: false)
     @first_scene = first_scene
-    @debug_mode = debug_mode
+
+    state.rddr_debug_mode = debug_mode
   end
 
   def call
-    debug! if @debug_mode
+    debug! if state.rddr_debug_mode
 
     state.current_scene ||= @first_scene.new
 
@@ -29,8 +30,6 @@ class RDDR::Tick < RDDR::GTKObject
   end
 
   def debug!
-    state.rddr_debug_mode ||= true
-
     if @last_tick_time
       now = Time.now.to_f
       tps = 1/(now - @last_tick_time)

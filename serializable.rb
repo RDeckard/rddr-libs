@@ -8,7 +8,7 @@ module RDDR::Serializable
 
         [ivar_name, instance_variable_get(instance_variable_name)]
       end.
-      delete_if { |k, _| self.class::EXCLUDED_ATTRIBUTES_FROM_SERIALIZATION.include?(k) }
+      delete_if { |k, _| excluded_attributes_from_serialization.include?(k) }
   end
 
   def inspect
@@ -17,5 +17,9 @@ module RDDR::Serializable
 
   def to_s
     serialize.to_s
+  end
+
+  def excluded_attributes_from_serialization
+    self.class::EXCLUDED_ATTRIBUTES_FROM_SERIALIZATION
   end
 end
