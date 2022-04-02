@@ -19,4 +19,5 @@ require "lib/rddr-libs/tools/gui/prompt.rb"
 require "lib/rddr-libs/tools/gui/slider.rb"
 require "lib/rddr-libs/tools/gui/text_box.rb"
 
+require "lib/rddr-libs/tools/timer.rb"
 require "lib/rddr-libs/tools/validable.rb"

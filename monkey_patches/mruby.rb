@@ -35,11 +35,11 @@ class String
     delete(" ").empty?
   end
 
-  def first
-    self[0]
+  def first(n = 1)
+    self[0, n]
   end
 
-  def last
-    self[-1]
+  def last(n = 1)
+    self[-n, n]
   end
 end
