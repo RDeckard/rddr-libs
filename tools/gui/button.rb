@@ -1,30 +1,29 @@
 class RDDR::Button < RDDR::GTKObject
-  attr_accessor :x, :y, :w, :h
-  attr_reader   :rect
+  attr_reader   :text
+  attr_accessor :rect
 
-  def initialize(x: 0, y: 0, w:, h: 0, text: nil, text_size: 1)
-    @x = x
-    @y = y
-    @w = w
-    @h = h
-
-    @text = text
+  def initialize(text: nil, text_size: 1, rect: { x: 0, y: 0, w: 0, h: 0 })
     @text_size = text_size
+    @rect      = rect
+    self.text  = text
+
+    @rect.h = 2*@text_rect.h if @text
+  end
+
+  def text=(text)
+    @text = text
     @text_rect = %i[w h].zip(gtk.calcstringbox(text, @text_size)).to_h
 
-    @h = 2*@text_rect.h if @text
-
-    primitives
+    @rect.w = @text_rect.w + @text_rect.h if @text_rect.w > @rect.w
   end
 
   def primitives
     primitives = []
 
-    @rect = { x: @x, y: @y, w: @w, h: @h }
     primitives << RDDR::Box.new(@rect, background_color: :silver).primitives
 
     if @text
-      @label = { text: @text, size_enum: @text_size, r: 128, g: 128, b: 128 }.label!(@text_rect)
+      @label = { text: @text, size_enum: @text_size, **RDDR::Colors::SETS[:classic][:grey] }.label!(@text_rect)
       @label.merge!(geometry.center_inside_rect(@label, @rect)).merge!(y: @label.top)
       primitives << @label
     end
