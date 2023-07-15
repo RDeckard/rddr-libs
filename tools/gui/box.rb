@@ -6,6 +6,7 @@ class RDDR::Box < RDDR::GTKObject
   attr_reader :rect, :sprite_path, :angle
 
   def initialize(rect, border_thickness: nil, background_color: nil, border_color: nil, sprite_path: nil, angle: 0, invisible: nil)
+    rect = rect.to_hash if rect.is_a?(Array)
     @rect = rect.dup
 
     @border_thickness = border_thickness || 1
@@ -69,5 +70,9 @@ class RDDR::Box < RDDR::GTKObject
     return %i[primitives] if @sprite_path
 
     super
+  end
+
+  def reset_primitives!
+    @primitives = nil
   end
 end

@@ -40,7 +40,7 @@ module RDDR::Spriteable
         { x: x + w, y: y },
         { x: x + w, y: y + h },
         { x: x,     y: y + h }
-      ].map { geometry.rotate_point(_1, angle, rotation_center) }
+      ].map { Geometry.rotate_point(_1, angle, rotation_center) }
     end
   end
 
@@ -64,7 +64,7 @@ module RDDR::Spriteable
     else
       # Interesting point: this clause wouldn't work with square rotation cases! (ray_tests :left or :right is arbitrary with straight lines)
       shape_lines.
-        map { |shape_line| geometry.ray_test(point, shape_line) }.
+        map { |shape_line| Geometry.ray_test(point, shape_line) }.
         then do |ray_tests|
           ray_tests[0] == ray_tests[2] && ray_tests[1] == ray_tests[3] || !!ray_tests.index(:on)
         end

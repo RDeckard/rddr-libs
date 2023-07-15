@@ -1,7 +1,7 @@
 class RDDR::TextBox < RDDR::GTKObject
   attr_reader :text_lines
 
-  def initialize(text_lines, text_size: 0, container_rect: grid.rect, box_alignment: :center, box_alignment_v: :center, text_alignment: :left, text_offset: 5, box_offset: 5, max_width: nil, box_x: nil, box_y: nil)
+  def initialize(text_lines, text_size: 0, container_rect: grid.rect, box_alignment: :center, box_alignment_v: :center, text_alignment: :left, text_offset: 5, box_offset: 5, max_width: nil, box_x: nil, box_y: nil, invisible_box: false)
     @text_lines      = (text_lines.is_a?(String) ? text_lines.split("\n") : text_lines).flatten
     @text_size       = text_size
     @container_rect  = container_rect
@@ -13,6 +13,9 @@ class RDDR::TextBox < RDDR::GTKObject
     @max_width       = max_width || container_rect.w
     @box_x           = box_x
     @box_y           = box_y
+    @invisible_box   = invisible_box || false
+
+    yield(self) if block_given?
 
     primitives
   end
@@ -25,7 +28,7 @@ class RDDR::TextBox < RDDR::GTKObject
     rect.x ||=
       case @box_alignment
       when Numeric then @box_alignment
-      when :center then geometry.center_inside_rect_x(rect, @container_rect).x
+      when :center then Geometry.center_inside_rect_x(rect, @container_rect).x
       when :left   then @container_rect.left.shift_right(@box_offset)
       when :right  then @container_rect.right.shift_left(@box_offset + rect.w)
       end
@@ -33,12 +36,12 @@ class RDDR::TextBox < RDDR::GTKObject
     rect.y ||=
       case @box_alignment_v
       when Numeric then @box_alignment_v
-      when :center then geometry.center_inside_rect_y(rect, @container_rect).y
+      when :center then Geometry.center_inside_rect_y(rect, @container_rect).y
       when :top    then @container_rect.top.shift_down(@box_offset + rect.h)
       when :bottom then @container_rect.bottom.shift_up(@box_offset)
       end
 
-    @primitives << RDDR::Box.new(rect, background_color: :black).primitives
+    @primitives << RDDR::Box.new(rect, background_color: :black).primitives unless @invisible_box
 
     @primitives << @text_lines.map.with_index do |text, index|
       x =
@@ -77,5 +80,29 @@ class RDDR::TextBox < RDDR::GTKObject
 
       { x: @box_x, y: @box_y, w: box_w, h: box_h, a: 128 }
     end
+  end
+
+  def line_rect(line_index)
+    line_rindex = @text_lines.count - line_index - 1
+
+    {
+      x: rect.x,
+      y: rect.y + @line_h * line_rindex,
+      w: rect.w,
+      h: @line_h
+    }
+  end
+
+  def line_rects
+    @text_lines.map.with_index { |_, index| line_rect(index) }
+  end
+
+  def text_lines=(value)
+    @text_lines = value
+    reset_primitives!
+  end
+
+  def reset_primitives!
+    @primitives = nil
   end
 end

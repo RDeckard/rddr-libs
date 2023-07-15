@@ -26,7 +26,10 @@ class RDDR::Tick < RDDR::GTKObject
       gtk.reset
     end
 
+    return if gtk.production?
+
     gtk.reset if inputs.keyboard.key_held.alt && inputs.keyboard.key_down.r
+    state.rddr_debug_mode = !state.rddr_debug_mode if inputs.keyboard.key_held.alt && inputs.keyboard.key_down.d
   end
 
   def debug!

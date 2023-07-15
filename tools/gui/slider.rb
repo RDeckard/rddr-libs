@@ -37,7 +37,7 @@ class RDDR::Slider < RDDR::GTKObject
 
     # Slide
     @slide = { w: @h, h: @h }.solid!(r: 64, g: 64, b: 64)
-    @slide.merge!(geometry.center_inside_rect(@slide, @bar))
+    @slide.merge!(Geometry.center_inside_rect(@slide, @bar))
     primitives << @slide
 
     primitives

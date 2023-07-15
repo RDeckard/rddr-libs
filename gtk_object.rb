@@ -17,8 +17,8 @@ class RDDR::GTKObject
     args.grid
   end
 
-  def geometry
-    args.geometry
+  def layout
+    args.layout
   end
 
   def inputs
