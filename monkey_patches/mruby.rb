@@ -1,4 +1,11 @@
 class Object
+  # support ranges for #rand
+  def rand(arg = nil)
+    return super(arg) unless arg.is_a?(Range)
+
+    super(arg.max - arg.min + 1) + arg.min
+  end
+
   def blank?
     !self
   end
