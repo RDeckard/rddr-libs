@@ -18,6 +18,10 @@ require "lib/rddr-libs/tools/gui/text_inputs.rb"
 require "lib/rddr-libs/tools/gui/prompt.rb"
 require "lib/rddr-libs/tools/gui/slider.rb"
 require "lib/rddr-libs/tools/gui/text_box.rb"
-
 require "lib/rddr-libs/tools/timer.rb"
 require "lib/rddr-libs/tools/validable.rb"
+
+# SubScreen
+require "lib/rddr-libs/sub_screen/concerns/shakeable.rb"
+require "lib/rddr-libs/sub_screen/sub_screen.rb"
+require "lib/rddr-libs/sub_screen/camera.rb"

@@ -3,7 +3,7 @@ class RDDR::Box < RDDR::GTKObject
 
   DEFAULT_COLOR = { r: 0, g: 0, b: 0, a: 255 }.freeze
 
-  attr_reader :rect, :sprite_path, :angle
+  attr_reader :rect, :border_thickness, :background_color, :border_color, :sprite_path, :angle, :invisible
 
   def initialize(rect, border_thickness: nil, background_color: nil, border_color: nil, sprite_path: nil, angle: 0, invisible: nil)
     rect = rect.to_hash if rect.is_a?(Array)
