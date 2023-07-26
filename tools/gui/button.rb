@@ -23,7 +23,7 @@ class RDDR::Button < RDDR::GTKObject
     primitives << RDDR::Box.new(@rect, background_color: :silver).primitives
 
     if @text
-      @label = { text: @text, size_enum: @text_size, **RDDR::Colors::SETS[:classic][:grey] }.label!(@text_rect)
+      @label = { text: @text, size_enum: @text_size, **RDDR.color(:grey) }.label!(@text_rect)
       @label.merge!(Geometry.center_inside_rect(@label, @rect)).merge!(y: @label.top)
       primitives << @label
     end

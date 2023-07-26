@@ -14,4 +14,11 @@ module RDDR
         end.presence || NEW_LINE
     end
   end
+
+  def color(*args)
+    args.flatten!(1)
+
+    args = [:classic, *args] if args.one?
+    RDDR::Colors::SETS.dig(*args).dup
+  end
 end

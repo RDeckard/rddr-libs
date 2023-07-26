@@ -13,19 +13,19 @@ class RDDR::Box < RDDR::GTKObject
     @background_color = background_color || %i[classic white]
     @border_color     = border_color     || %i[classic black]
 
-    if @background_color.is_a?(Hash)
-      @background_color = DEFAULT_COLOR.merge(@background_color)
-    else
-      @background_color = [:classic, @background_color] unless @background_color.is_a?(Array)
-      @background_color = RDDR::Colors::SETS.dig(*@background_color)
-    end
+    @background_color =
+      if @background_color.is_a?(Hash)
+        DEFAULT_COLOR.merge(@background_color)
+      else
+        RDDR.color(@background_color)
+      end
 
-    if @border_color.is_a?(Hash)
-      @border_color = DEFAULT_COLOR.merge(@border_color)
-    else
-      @border_color = [:classic, @border_color] unless @border_color.is_a?(Array)
-      @border_color = RDDR::Colors::SETS.dig(*@border_color)
-    end
+    @border_color =
+      if @border_color.is_a?(Hash)
+        DEFAULT_COLOR.merge(@border_color)
+      else
+        RDDR.color(@border_color)
+      end
 
     @sprite_path = sprite_path
     @angle       = angle
