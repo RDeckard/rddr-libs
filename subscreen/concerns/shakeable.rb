@@ -1,4 +1,4 @@
-class RDDR::SubScreen < RDDR::GTKObject
+class RDDR::Subscreen < RDDR::GTKObject
   module Shakeable
     def trauma!(amount)
       @trauma += amount
@@ -12,7 +12,7 @@ class RDDR::SubScreen < RDDR::GTKObject
       next_angle = 180.0 / 20.0 * @trauma**2
       next_offset = 100.0 * @trauma**2
 
-      # Ensure that the sub screen angle always switches from
+      # Ensure that the subscreen angle always switches from
       # positive to negative and vice versa
       # which gives the effect of shaking back and forth
       @angle = @angle > 0 ? next_angle * -1 : next_angle
