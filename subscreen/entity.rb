@@ -1,4 +1,4 @@
-class RDDR::Subscreen < RDDR::GTKObject
+class RDDR::Subscreen
   module Entity
     include RDDR::Spriteable
 

@@ -1,6 +1,6 @@
 class RDDR::Tick < RDDR::GTKObject
   def initialize(first_scene, debug_mode: false)
-    @first_scene = first_scene
+    change_scene!(first_scene)
 
     state.rddr_debug_mode = debug_mode
   end
@@ -8,11 +8,14 @@ class RDDR::Tick < RDDR::GTKObject
   def call
     debug! if state.rddr_debug_mode
 
-    state.current_scene ||= @first_scene.new
-
-    state.current_scene.tick
+    current_scene.tick
 
     handle_quit_and_reset
+  end
+
+  def change_scene!(scene_class)
+    state.current_scene = scene_class.new
+    current_scene.init
   end
 
   def handle_quit_and_reset
@@ -47,7 +50,7 @@ class RDDR::Tick < RDDR::GTKObject
       if @last_print_time.nil? || now - @last_print_time >= 1
         h = {}
         puts "------"
-        puts "SCENE: #{state.current_scene.class.name}"
+        puts "SCENE: #{current_scene.class.name}"
         puts "TPS: #{tps}"
         puts "PRIMITIVES: #{outputs.static_primitives.flatten.size}"
         puts ObjectSpace.count_objects(h)

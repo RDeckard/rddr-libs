@@ -34,4 +34,18 @@ class RDDR::GTKObject
 
     puts(...)
   end
+
+  # Conventions
+
+  def game_tick
+    state.game_tick
+  end
+
+  def current_scene
+    state.current_scene
+  end
+
+  def game_state
+    state.game
+  end
 end

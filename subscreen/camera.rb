@@ -1,4 +1,4 @@
-class RDDR::Subscreen < RDDR::GTKObject
+class RDDR::Subscreen
   class Camera < RDDR::GTKObject
     EXCLUDED_ATTRIBUTES_FROM_SERIALIZATION = %i[subscreen].freeze
 
