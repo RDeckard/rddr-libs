@@ -3,9 +3,9 @@ class RDDR::Subscreen < RDDR::GTKObject
 
   EXCLUDED_ATTRIBUTES_FROM_SERIALIZATION = %i[entities].freeze
 
-  attr_reader :x, :y, :w, :h, :buffer_name, :target, :entities
+  attr_reader :x, :y, :w, :h, :buffer_name, :target, :entities, :world_grid
 
-  def initialize(buffer_name, x: nil, y: nil, w: grid.w, h: grid.h, target: nil)
+  def initialize(buffer_name, x: nil, y: nil, w: grid.w, h: grid.h, target: nil, scale_world_grid: 1)
     @buffer_name = buffer_name
 
     @w = w
@@ -17,11 +17,24 @@ class RDDR::Subscreen < RDDR::GTKObject
     x ? @x = x : center!(:horizontal)
     y ? @y = y : center!(:vertical)
 
+    @world_grid = camera.world_viewport.scale_rect(scale_world_grid, 0.5)
+
     init_shaking!
   end
 
   def rect
     @rect ||= { x: @x, y: @y, w: @w, h: @h }
+  end
+
+  def rect=(new_rect)
+    @x = new_rect.x
+    @y = new_rect.y
+    @w = new_rect.w
+    @h = new_rect.h
+
+    @rect = nil
+    @half_w = nil
+    @half_h = nil
   end
 
   def half_w
@@ -34,22 +47,26 @@ class RDDR::Subscreen < RDDR::GTKObject
 
   def x=(value)
     @x = value
+
     @rect = nil
   end
 
   def y=(value)
     @y = value
+
     @rect = nil
   end
 
   def w=(value)
     render_target.w = @w = value
+
     @rect = nil
     @half_w = nil
   end
 
   def h=(value)
     render_target.h = @h = value
+
     @rect = nil
     @half_h = nil
   end
@@ -67,6 +84,13 @@ class RDDR::Subscreen < RDDR::GTKObject
 
   def world_viewport
     from_grid_to_world_space(rect)
+  end
+
+  def random_world_point
+    {
+      x: rand(world_grid.left..world_grid.right), y: rand(world_grid.bottom..world_grid.top),
+      w: 0, h: 0,
+    }
   end
 
   def visible_entities

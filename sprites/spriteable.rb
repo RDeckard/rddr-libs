@@ -23,6 +23,8 @@ module RDDR::Spriteable
     flip_vertically: self.class::FLIP_VERTICALLY,
     **kwargs
   )
+    super(**kwargs)
+
     @angle = angle
 
     @sprite_scale = sprite_scale
@@ -31,8 +33,6 @@ module RDDR::Spriteable
 
     @w = sprite_width * @sprite_scale
     @h = sprite_height * @sprite_scale
-
-    super(**kwargs)
   end
 
   def set_flips(flip_horizontally, flip_vertically)

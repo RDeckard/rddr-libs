@@ -49,4 +49,12 @@ class String
   def last(n = 1)
     self[-n, n]
   end
+
+  def -@
+    self.freeze
+  end
+
+  def +@
+    self.dup
+  end
 end

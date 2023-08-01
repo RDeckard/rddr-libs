@@ -8,6 +8,8 @@ class RDDR::Subscreen
     attr_reader :subscreen, :camera
 
     def initialize(subscreen, x: 0, y: 0, **kwargs)
+      super(**kwargs)
+
       @subscreen = subscreen
       @subscreen.entities << self
 
@@ -15,8 +17,6 @@ class RDDR::Subscreen
 
       @x = x
       @y = y
-
-      super(**kwargs)
     end
 
     def world_angle
@@ -25,6 +25,14 @@ class RDDR::Subscreen
 
     def world_angle=(value)
       self.angle = value - self.class::ANGLE_OFFSET
+    end
+
+    def world_grid
+      @subscreen.world_grid
+    end
+
+    def destroy!
+      @subscreen.entities.delete(self)
     end
 
     def subscreen_rect
