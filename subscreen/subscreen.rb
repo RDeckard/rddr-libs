@@ -12,7 +12,7 @@ class RDDR::Subscreen < RDDR::GTKObject
     @h = h
     @target = target
 
-    @entities = []
+    @entities = Hash.new { |h, k| h[k] = [] }
 
     x ? @x = x : center!(:horizontal)
     y ? @y = y : center!(:vertical)
@@ -93,8 +93,16 @@ class RDDR::Subscreen < RDDR::GTKObject
     }
   end
 
+  def flatten_entities
+    @entities.values.flatten
+  end
+
   def visible_entities
     @camera.visible_entities
+  end
+
+  def entities_tick
+    @entities.each_value.each { _1.each(&:tick) }
   end
 
   def from_grid_to_subscreen_space(grid_rect)

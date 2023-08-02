@@ -84,7 +84,9 @@ class RDDR::Subscreen
     end
 
     def visible_entities
-      @subscreen.entities.select { |entity| Geometry.intersect_rect?(world_viewport, entity.rect) }
+      @subscreen
+        .flatten_entities
+        .select { |entity| Geometry.intersect_rect?(world_viewport, entity.rect) }
     end
 
     # Find rects (or anything responding to #rect) or objects (need a block) within viewport
@@ -102,7 +104,7 @@ class RDDR::Subscreen
       if only_visible
         rect_collisions(visible_entities, radius_ratio: radius_ratio)
       else
-        rect_collisions(@subscreen.entities, radius_ratio: radius_ratio)
+        rect_collisions(@subscreen.flatten_entities, radius_ratio: radius_ratio)
       end
     end
 
