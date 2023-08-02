@@ -8,13 +8,18 @@ module RDDR::Spriteable
   SPRITE_WIDTH = nil # optional, fallback to SPRITE_SIZE
   SPRITE_HEIGHT = nil # optional, fallback to SPRITE_SIZE
 
+  SPRITE_SCALES = nil # optional, useful to compute the #mass
+  MASS_MIN = 0
+  MASS_MAX = 1
+
   ANCHOR = { x: 0, y: 0 }.freeze
   ANGLE_ANCHOR = { x: 0.5, y: 0.5 }.freeze
 
   FLIP_HORIZONTALLY = false
   FLIP_VERTICALLY = false
 
-  attr_accessor :x, :y, :w, :h, :angle, :sprite_scale, :flip_horizontally, :flip_vertically
+  attr_accessor :x, :y, :w, :h, :angle, :flip_horizontally, :flip_vertically
+  attr_reader :sprite_scale
 
   def initialize(
     angle: 0,
@@ -28,11 +33,13 @@ module RDDR::Spriteable
     @angle = angle
 
     @sprite_scale = sprite_scale
+    mass # trigger calculation
 
     set_flips(flip_horizontally, flip_vertically)
 
     @w = sprite_width * @sprite_scale
     @h = sprite_height * @sprite_scale
+
   end
 
   def set_flips(flip_horizontally, flip_vertically)
@@ -57,6 +64,27 @@ module RDDR::Spriteable
 
   def angle_anchor
     self.class::ANGLE_ANCHOR
+  end
+
+  def sprite_scale=(value)
+    @sprite_scale = value
+
+    @mass = nil
+  end
+
+  # from min to max, proportional to sprite_scale relative to SPRITE_SCALES
+  def mass
+    return 1 if self.class::SPRITE_SCALES.nil?
+
+    @mass ||=
+      begin
+        min_scale, max_scale = self.class::SPRITE_SCALES.minmax
+        ratio = (sprite_scale - min_scale) / (max_scale - min_scale)
+
+        (
+          self.class::MASS_MIN * (1 - ratio) + ratio * self.class::MASS_MAX
+        ).clamp(self.class::MASS_MIN, self.class::MASS_MAX).round(2)
+      end
   end
 
   # Can be overriden by subclasses
