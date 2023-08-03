@@ -1,5 +1,5 @@
 module RDDR::Animatable
-  SPRITE_SHEET = nil # A sprite can't be animatable without a sprite sheet
+  SPRITE_SHEET = nil # # optional, fallback to #sprite_sheet (sprite can't be animatable without a sprite sheet)
   FRAMES_PER_COLLECTION = 1
   DIRECTION_OF_COLLECTIONS = :horizontal # :horizontal, :vertical, :horizontal_then_vertical, :vertical_then_horizontal
   FRAMES_COLLECTIONS = { default: 0 }.freeze # Only use with :horizontal and :vertical directions: indexes of the row/column of each collection
@@ -8,19 +8,30 @@ module RDDR::Animatable
   TILES_ORIGIN_X = 0
   TILES_ORIGIN_Y = 0
 
-  attr_accessor :frames_collection, :ticks_per_frame, :random_first_frame
+  CYCLE = true
+
+  attr_accessor :sprite_sheet, :frames_collection, :ticks_per_frame, :random_first_frame, :cycle
 
   def initialize(
+        sprite_sheet: self.class::SPRITE_SHEET,
         frames_collection: :default,
         ticks_per_frame: self.class::TICKS_PER_FRAME,
-        random_first_frame: self.class::RANDOM_FIRST_FRAME
+        random_first_frame: self.class::RANDOM_FIRST_FRAME,
+        cycle: self.class::CYCLE
       )
+    @sprite_sheet = sprite_sheet
+
     set_frames_collection(frames_collection)
 
     @ticks_per_frame = ticks_per_frame
     @random_first_frame = random_first_frame
+    @cycle = cycle
 
     start_animation!
+  end
+
+  def animatable?
+    sprite_sheet.present?
   end
 
   def set_frames_collection(frames_collection)
@@ -49,7 +60,8 @@ module RDDR::Animatable
 
   def cycling_animated_params
     if self.class::FRAMES_PER_COLLECTION > 1
-      tile_index = @animation_started_at.frame_index(self.class::FRAMES_PER_COLLECTION, ticks_per_frame, true)
+      tile_index = tile_index()
+
       case self.class::DIRECTION_OF_COLLECTIONS
       when :horizontal_then_vertical
         tile_index += @frames_collection_index
@@ -68,10 +80,26 @@ module RDDR::Animatable
     end
 
     {
-      path: self.class::SPRITE_SHEET,
+      path: sprite_sheet,
       tile_x: self.class::TILES_ORIGIN_X + (tile_x_index * sprite_width),
       tile_y: self.class::TILES_ORIGIN_Y + (tile_y_index * sprite_height),
       tile_w: sprite_width, tile_h: sprite_height,
     }
+  end
+
+  def tile_index
+    @animation_started_at.frame_index(self.class::FRAMES_PER_COLLECTION, ticks_per_frame, @cycle)
+  end
+
+  def animation_finished?
+    raise "#{self.class} is not animatable" unless animatable?
+    return false if @cycle
+
+    # we want to memoize only the true value, so we can use ||= on this boolean
+    @animation_finished ||= !tile_index
+  end
+
+  def animation_alived?
+    !animation_finished?
   end
 end

@@ -93,12 +93,21 @@ class RDDR::Subscreen < RDDR::GTKObject
     }
   end
 
-  def flatten_entities
-    @entities.values.flatten
+  def all_entities(only_visible: false, only_collidable: false)
+    @entities
+      .values
+      .tap(&:flatten!)
+      .tap do |entities|
+        entities.reject! do |entity|
+          (only_visible && !entity.visible?) || (only_collidable && !entity.collidable?)
+        end
+      end
   end
 
-  def visible_entities
-    @camera.visible_entities
+  def viewport_entities(...)
+    world_viewport = world_viewport()
+
+    all_entities(...).select { Geometry.intersect_rect?(world_viewport, _1) }
   end
 
   def entities_tick

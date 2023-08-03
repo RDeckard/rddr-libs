@@ -3,10 +3,10 @@ module RDDR::Spriteable
 
   DEFAULT_SPRITE = "pixel"
 
-  SPRITE_PATH = nil # optional, fallback to DEFAULT_SPRITE
-  SPRITE_SCALE = 1.0
-  SPRITE_WIDTH = nil # optional, fallback to SPRITE_SIZE
-  SPRITE_HEIGHT = nil # optional, fallback to SPRITE_SIZE
+  SPRITE_PATH = nil # optional, fallback to #sprite_path then DEFAULT_SPRITE
+  SPRITE_SCALE = 1.0 # optional, fallback to #sprite_scale then 1.0
+  SPRITE_WIDTH = nil # optional, fallback to #sprite_width then SPRITE_SIZE
+  SPRITE_HEIGHT = nil # optional, fallback to #sprite_height then SPRITE_SIZE
 
   SPRITE_SCALES = nil # optional, useful to compute the #mass
   MASS_MIN = 0
@@ -18,28 +18,39 @@ module RDDR::Spriteable
   FLIP_HORIZONTALLY = false
   FLIP_VERTICALLY = false
 
-  attr_accessor :x, :y, :w, :h, :angle, :flip_horizontally, :flip_vertically
+  VISIBLE = true
+
+  attr_accessor :x, :y, :w, :h, :angle, :sprite_width, :sprite_height, :flip_horizontally, :flip_vertically
   attr_reader :sprite_scale
+  attr_writer :sprite_path, :visible
 
   def initialize(
     angle: 0,
+    sprite_path: self.class::SPRITE_PATH,
+    sprite_width: self.class::SPRITE_WIDTH || self.class::SPRITE_SIZE,
+    sprite_height: self.class::SPRITE_HEIGHT || self.class::SPRITE_SIZE,
     sprite_scale: self.class::SPRITE_SCALE,
     flip_horizontally: self.class::FLIP_HORIZONTALLY,
     flip_vertically: self.class::FLIP_VERTICALLY,
+    visible: self.class::VISIBLE,
     **kwargs
   )
-    super(**kwargs)
-
     @angle = angle
 
+    @sprite_path = sprite_path
+    @sprite_width = sprite_width
+    @sprite_height = sprite_height
     @sprite_scale = sprite_scale
     mass # trigger calculation
 
     set_flips(flip_horizontally, flip_vertically)
 
-    @w = sprite_width * @sprite_scale
-    @h = sprite_height * @sprite_scale
+    @visible = visible
 
+    @w = @sprite_width * @sprite_scale
+    @h = @sprite_height * @sprite_scale
+
+    super(**kwargs)
   end
 
   def set_flips(flip_horizontally, flip_vertically)
@@ -89,15 +100,15 @@ module RDDR::Spriteable
 
   # Can be overriden by subclasses
   def sprite_path
-    self.class::SPRITE_PATH || DEFAULT_SPRITE
+    @sprite_path ||= DEFAULT_SPRITE
   end
 
-  def sprite_width
-    self.class::SPRITE_WIDTH || self.class::SPRITE_SIZE
+  def visible?
+    @visible
   end
 
-  def sprite_height
-    self.class::SPRITE_HEIGHT || self.class::SPRITE_SIZE
+  def invisible?
+    !visible?
   end
 
   def rect
@@ -195,9 +206,11 @@ module RDDR::Spriteable
   end
 
   def draw_override(ffi_draw)
+    return if invisible? || (animatable? && animation_finished?)
+
     params = draw_parameters
 
-    params.merge!(cycling_animated_params) if self.class::SPRITE_SHEET.present?
+    params.merge!(cycling_animated_params) if animatable?
 
     ffi_draw.draw_sprite_5(
       params[:x], params[:y],

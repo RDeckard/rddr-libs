@@ -5,15 +5,18 @@ class RDDR::Subscreen
     EXCLUDED_ATTRIBUTES_FROM_SERIALIZATION = %i[subscreen camera].freeze
 
     ANCHOR = { x: 0.5, y: 0.5 }.freeze
-    ANGLE_OFFSET = 90
+    ANGLE_OFFSET = 0
 
+    COLLIDABLE = false
+
+    attr_accessor :collidable
     attr_reader :subscreen, :camera
 
     def self.included(base)
       base.extend ClassMethods
     end
 
-    def initialize(subscreen, x: 0, y: 0, **kwargs)
+    def initialize(subscreen, x: 0, y: 0, world_angle: nil, collidable: self.class::COLLIDABLE, **kwargs)
       super(**kwargs)
 
       @subscreen = subscreen
@@ -23,10 +26,21 @@ class RDDR::Subscreen
 
       @x = x
       @y = y
+
+      self.world_angle = world_angle if world_angle
+
+      @collidable = collidable
     end
 
     # to be overriden by subclasses
     def tick
+      destroy! if tile_index.zero?
+
+      @last_tile_index = tile_index
+    end
+
+    def collidable?
+      @collidable
     end
 
     def world_angle
@@ -47,6 +61,10 @@ class RDDR::Subscreen
 
     def subscreen_rect
       @camera.to_subscreen_space(rect)
+    end
+
+    def subscreen_shape_rect
+      @camera.to_subscreen_space(shape_rect)
     end
 
     def draw_parameters

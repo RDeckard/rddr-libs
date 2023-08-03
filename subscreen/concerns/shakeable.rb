@@ -1,5 +1,7 @@
 class RDDR::Subscreen < RDDR::GTKObject
   module Shakeable
+    attr_accessor :trauma
+
     def trauma!(amount)
       @trauma += amount
     end
