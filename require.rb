@@ -28,6 +28,7 @@ require "lib/rddr-libs/tools/validable.rb"
 
 # Subscreen
 require "lib/rddr-libs/subscreen/concerns/shakeable.rb"
+require "lib/rddr-libs/subscreen/concerns/resizeable.rb"
 require "lib/rddr-libs/subscreen/subscreen.rb"
 require "lib/rddr-libs/subscreen/camera.rb"
 require "lib/rddr-libs/subscreen/entity.rb"

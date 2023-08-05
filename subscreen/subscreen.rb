@@ -1,5 +1,6 @@
 class RDDR::Subscreen < RDDR::GTKObject
   include RDDR::Subscreen::Shakeable
+  include RDDR::Subscreen::Resizeable
 
   EXCLUDED_ATTRIBUTES_FROM_SERIALIZATION = %i[entities].freeze
 
@@ -16,6 +17,8 @@ class RDDR::Subscreen < RDDR::GTKObject
 
     x ? @x = x : center!(:horizontal)
     y ? @y = y : center!(:vertical)
+
+    @initial_rect = rect.dup
 
     @world_grid = camera.world_viewport.scale_rect(scale_world_grid, 0.5)
 
@@ -158,6 +161,10 @@ class RDDR::Subscreen < RDDR::GTKObject
     from_subscreen_to_grid_space(from_world_to_subscreen_space(world_rect))
   end
 
+  def toggle_fullscreen!
+    start_resizing!(rect.values_at(:x, :y, :w, :h) == grid.rect ? @initial_rect : grid)
+  end
+
   def render_target
     outputs[@buffer_name]
   end
@@ -170,6 +177,7 @@ class RDDR::Subscreen < RDDR::GTKObject
     render_target.h = @h
 
     shaking!
+    easing_resize!
 
     @last_prerender = state.tick_count
   end
