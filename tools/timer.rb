@@ -1,4 +1,4 @@
-module Timer
+module RDDR::Timer
   extend self
 
   def throttle(...)
