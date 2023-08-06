@@ -161,8 +161,12 @@ class RDDR::Subscreen < RDDR::GTKObject
     from_subscreen_to_grid_space(from_world_to_subscreen_space(world_rect))
   end
 
+  def fullscreen?
+    rect.values_at(:x, :y, :w, :h) == grid.rect
+  end
+
   def toggle_fullscreen!
-    start_resizing!(rect.values_at(:x, :y, :w, :h) == grid.rect ? @initial_rect : grid)
+    start_resizing!(fullscreen? ? @initial_rect : grid)
   end
 
   def render_target

@@ -20,8 +20,8 @@ module RDDR::Spriteable
 
   VISIBLE = true
 
-  attr_accessor :x, :y, :w, :h, :angle, :sprite_width, :sprite_height, :flip_horizontally, :flip_vertically
-  attr_reader :sprite_scale
+  attr_accessor :x, :y, :w, :h, :sprite_width, :sprite_height, :flip_horizontally, :flip_vertically
+  attr_reader :angle, :sprite_scale
   attr_writer :sprite_path, :visible
 
   def initialize(

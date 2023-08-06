@@ -5,7 +5,6 @@ class RDDR::Subscreen
     EXCLUDED_ATTRIBUTES_FROM_SERIALIZATION = %i[subscreen camera].freeze
 
     ANCHOR = { x: 0.5, y: 0.5 }.freeze
-    ANGLE_OFFSET = 0
 
     COLLIDABLE = false
 
@@ -16,7 +15,7 @@ class RDDR::Subscreen
       base.extend ClassMethods
     end
 
-    def initialize(subscreen, x: 0, y: 0, world_angle: nil, collidable: self.class::COLLIDABLE, **kwargs)
+    def initialize(subscreen, x: 0, y: 0, collidable: self.class::COLLIDABLE, **kwargs)
       super(**kwargs)
 
       @subscreen = subscreen
@@ -26,8 +25,6 @@ class RDDR::Subscreen
 
       @x = x
       @y = y
-
-      self.world_angle = world_angle if world_angle
 
       @collidable = collidable
     end
@@ -41,14 +38,6 @@ class RDDR::Subscreen
 
     def collidable?
       @collidable
-    end
-
-    def world_angle
-      (angle + self.class::ANGLE_OFFSET).mod(360)
-    end
-
-    def world_angle=(value)
-      self.angle = value - self.class::ANGLE_OFFSET
     end
 
     def world_grid
