@@ -6,10 +6,9 @@ class RDDR::Tick < RDDR::GTKObject
   end
 
   def call
-    debug! if state.rddr_debug_mode
-
     current_scene.tick
 
+    debug! if state.rddr_debug_mode
     handle_quit_and_reset
   end
 
@@ -36,6 +35,22 @@ class RDDR::Tick < RDDR::GTKObject
   end
 
   def debug!
+    @tabulation = " " * 16
+    @output_counter ||=
+      lambda { |objects|
+        objects.flatten!
+        count = objects.size
+        details =
+          objects.map do |object|
+            {
+              primitive_marker: object.primitive_marker,
+              path_or_class: (object.is_a?(Hash) ? object.path : object.class)
+            }
+          end.tally.sort_by { [-_2, _1[:primitive_marker]] }.map { "#{_2} #{_1[:primitive_marker]} #{_1[:path_or_class]}" }.join("\n#{@tabulation}")
+
+        "(#{count})#{"\n#{@tabulation}" if details.present?}#{details}"
+      }
+
     if @last_tick_time
       now = Time.now.to_f
       tps = 1/(now - @last_tick_time)
@@ -52,7 +67,37 @@ class RDDR::Tick < RDDR::GTKObject
         puts "------"
         puts "SCENE: #{current_scene.class.name}"
         puts "TPS: #{tps}"
-        puts "PRIMITIVES: #{outputs.static_primitives.flatten.size}"
+        puts "STATIC PRIMITIVES: #{@output_counter.(outputs.static_primitives)}"
+        puts "PRIMITIVES: #{@output_counter.(outputs.primitives)}"
+        puts "STATIC SOLIDS: #{@output_counter.(outputs.static_solids)}"
+        puts "SOLIDS: #{@output_counter.(outputs.solids)}"
+        puts "STATIC SPRITES: #{@output_counter.(outputs.static_sprites)}"
+        puts "SPRITES: #{@output_counter.(outputs.sprites)}"
+        puts "STATIC LABELS: #{@output_counter.(outputs.static_labels)}"
+        puts "LABELS: #{@output_counter.(outputs.labels)}"
+        puts "STATIC LINES: #{@output_counter.(outputs.static_lines)}"
+        puts "LINES: #{@output_counter.(outputs.lines)}"
+        puts "STATIC BORDERS: #{@output_counter.(outputs.static_borders)}"
+        puts "BORDERS: #{@output_counter.(outputs.borders)}"
+        puts "STATIC DEBUG: #{@output_counter.(outputs.static_debug)}"
+        puts "DEBUG: #{@output_counter.(outputs.debug)}"
+        state.render_targets&.each do |name|
+          puts "--- #{name.inspect} ---"
+          puts "-- STATIC PRIMITIVES: #{@output_counter.(outputs[name].static_primitives)}"
+          puts "-- PRIMITIVES: #{@output_counter.(outputs[name].primitives)}"
+          puts "-- STATIC SOLIDS: #{@output_counter.(outputs[name].static_solids)}"
+          puts "-- SOLIDS: #{@output_counter.(outputs[name].solids)}"
+          puts "-- STATIC SPRITES: #{@output_counter.(outputs[name].static_sprites)}"
+          puts "-- SPRITES: #{@output_counter.(outputs[name].sprites)}"
+          puts "-- STATIC LABELS: #{@output_counter.(outputs[name].static_labels)}"
+          puts "-- LABELS: #{@output_counter.(outputs[name].labels)}"
+          puts "-- STATIC LINES: #{@output_counter.(outputs[name].static_lines)}"
+          puts "-- LINES: #{@output_counter.(outputs[name].lines)}"
+          puts "-- STATIC BORDERS: #{@output_counter.(outputs[name].static_borders)}"
+          puts "-- BORDERS: #{@output_counter.(outputs[name].borders)}"
+          puts "-- STATIC DEBUG: #{@output_counter.(outputs[name].static_debug)}"
+          puts "-- DEBUG: #{@output_counter.(outputs[name].debug)}"
+        end
         puts ObjectSpace.count_objects(h)
         puts "------"
         @last_print_time = Time.now.to_f

@@ -11,18 +11,24 @@ class RDDR::Subscreen < RDDR::GTKObject
 
     @w = w
     @h = h
-    @target = target
-
-    @entities = Hash.new { |h, k| h[k] = [] }
-
     x ? @x = x : center!(:horizontal)
     y ? @y = y : center!(:vertical)
 
-    @initial_rect = rect.dup
+    @target = target
 
+    @entities = Hash.new { |h, k| h[k] = [] }
     @world_grid = camera.world_viewport.scale_rect(scale_world_grid, 0.5)
 
+    @initial_rect = rect.dup
+
     init_shaking!
+
+    return if gtk.production?
+
+    state.render_targets ||= []
+    state.render_targets << @buffer_name
+    state.render_targets << @target if @target
+    state.render_targets.uniq!
   end
 
   def rect

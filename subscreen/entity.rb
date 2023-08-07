@@ -9,7 +9,7 @@ class RDDR::Subscreen
     COLLIDABLE = false
 
     attr_accessor :collidable
-    attr_reader :subscreen, :camera
+    attr_reader :subscreen
 
     def self.included(base)
       base.extend ClassMethods
@@ -18,10 +18,7 @@ class RDDR::Subscreen
     def initialize(subscreen, x: 0, y: 0, collidable: self.class::COLLIDABLE, **kwargs)
       super(**kwargs)
 
-      @subscreen = subscreen
-      @subscreen.entities[type] << self
-
-      @camera = subscreen.camera
+      self.subscreen = subscreen
 
       @x = x
       @y = y
@@ -29,9 +26,24 @@ class RDDR::Subscreen
       @collidable = collidable
     end
 
+    def camera
+      @subscreen.camera
+    end
+
+    def subscreen=(new_subscreen)
+      remove_from_subscreen! if @subscreen
+
+      @subscreen = new_subscreen
+      @subscreen.entities[type] << self
+    end
+
+    def remove_from_subscreen!
+      @subscreen.entities[type].delete(self)
+    end
+
     # to be overriden by subclasses
     def tick
-      destroy! if tile_index.zero?
+      remove_from_subscreen! if tile_index.zero?
 
       @last_tile_index = tile_index
     end
@@ -44,16 +56,16 @@ class RDDR::Subscreen
       @subscreen.world_grid
     end
 
-    def destroy!
-      @subscreen.entities[type].delete(self)
+    def out_of_world_grid?
+      !rect.intersect_rect?(world_grid)
     end
 
     def subscreen_rect
-      @camera.to_subscreen_space(rect)
+      camera.to_subscreen_space(rect)
     end
 
     def subscreen_shape_rect
-      @camera.to_subscreen_space(shape_rect)
+      camera.to_subscreen_space(shape_rect)
     end
 
     def draw_parameters
