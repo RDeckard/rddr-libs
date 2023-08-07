@@ -91,15 +91,8 @@ class RDDR::Subscreen
       @subscreen.viewport_entities(...)
     end
 
-    def entities_collisions(only_viewport: false, only_visible: false, only_collidable: true, radius_ratio: false)
-      entities =
-        if only_viewport
-          viewport_entities(only_visible: only_visible, only_collidable: only_collidable)
-        else
-          all_entities(only_visible: only_visible, only_collidable: only_collidable)
-        end
-
-      Geometry.find_all_collisions(entities, radius_ratio: radius_ratio)
+    def entities_collisions(only_viewport: true, **kwargs)
+      @subscreen.entities_collisions(only_viewport: only_viewport, **kwargs)
     end
 
     # Find rects (or anything responding to #rect) or objects (need a block) within viewport

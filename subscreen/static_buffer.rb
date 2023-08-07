@@ -7,7 +7,7 @@ class RDDR::StaticBuffer < RDDR::GTKObject
 
     outputs[@buffer_name].w = @rect.w
     outputs[@buffer_name].h = @rect.h
-    outputs[@buffer_name].static_primitives << yield(@rect)
+    outputs[@buffer_name].static_primitives << Array(yield(@rect)).tap(&:flatten!).each { _1.x -= @rect.x; _1.y -= @rect.y }
   end
 
   # Pass a optional block to adapt the buffer.rect to render_target where the buffer will be rendered

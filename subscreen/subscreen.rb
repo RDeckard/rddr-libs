@@ -113,6 +113,17 @@ class RDDR::Subscreen < RDDR::GTKObject
     all_entities(...).select { Geometry.intersect_rect?(world_viewport, _1) }
   end
 
+  def entities_collisions(only_viewport: false, only_visible: false, only_collidable: true, radius_ratio: false)
+    entities =
+      if only_viewport
+        viewport_entities(only_visible: only_visible, only_collidable: only_collidable)
+      else
+        all_entities(only_visible: only_visible, only_collidable: only_collidable)
+      end
+
+    Geometry.find_all_collisions(entities, radius_ratio: radius_ratio)
+  end
+
   def entities_tick
     @entities.each_value.each { _1.each(&:tick) }
   end

@@ -1,7 +1,6 @@
 require "lib/rddr-libs/rddr.rb"
 
 # Patches
-require "lib/rddr-libs/monkey_patches/math.rb"
 require "lib/rddr-libs/monkey_patches/geometry.rb"
 require "lib/rddr-libs/monkey_patches/gtk_inputs.rb"
 require "lib/rddr-libs/monkey_patches/mruby.rb"

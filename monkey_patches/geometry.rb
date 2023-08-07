@@ -13,15 +13,15 @@ module RDDR::Geometry
       next dspeed unless with_angle
 
       Math.atan2(dspeed_y, dspeed_x).then do |rangle|
-        [dspeed, Math.degrees(rangle)]
+        [dspeed, rangle.to_degrees]
       end
     end
   end
 
   # Find all collisions of rect (or anything responding to #rect) or objects (need a block)
-  # Give an optional radius_ratio if you want to use a circle instead of a rect (proportionally to the rect larger side)
-  def find_all_collisions(objects, radius_ratio: false)
-    objects = objects.dup
+  # Give an optional radius_ratio if you want to use a circle instead of a rect (proportionally to the sum of rect larger sides)
+  def find_all_collisions(*objects, radius_ratio: false)
+    objects = objects.flatten # and not #flatten! because we want to duplicate the array
     collisions = []
 
     until objects.empty?
@@ -36,7 +36,7 @@ module RDDR::Geometry
             o2_collision_dist = object2.w.greater(object2.h)
             collision_distance = (o1_collision_dist + o2_collision_dist) * radius_ratio
 
-            Geometry.distance(object1, object2) <= collision_distance
+            Geometry.point_inside_circle?(object1, object2, collision_distance)
           else
             Geometry.intersect_rect?(object1, object2)
           end
@@ -46,6 +46,10 @@ module RDDR::Geometry
     end
 
     collisions
+  end
+
+  def any_collision?(...)
+    find_all_collisions(...).any?
   end
 end
 
