@@ -92,7 +92,6 @@ module RDDR::Animatable
   end
 
   def animation_finished?
-    raise "#{self.class} is not animatable" unless animatable?
     return false if @cycle
 
     # we want to memoize only the true value, so we can use ||= on this boolean

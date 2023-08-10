@@ -43,9 +43,7 @@ class RDDR::Subscreen
 
     # to be overriden by subclasses
     def tick
-      remove_from_subscreen! if tile_index.zero?
-
-      @last_tile_index = tile_index
+      remove_from_subscreen! if animation_finished?
     end
 
     def collidable?
