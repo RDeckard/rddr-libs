@@ -9,8 +9,9 @@ module RDDR::Spriteable
   SPRITE_HEIGHT = nil # optional, fallback to #sprite_height then SPRITE_SIZE
 
   SPRITE_SCALES = nil # optional, useful to compute the #mass
-  MASS_MIN = 0
-  MASS_MAX = 1
+  FIXED_MASS = 1 # optional, see #mass
+  MASS_MIN = 0 # optional, see #mass
+  MASS_MAX = 1 # optional, see #mass
 
   ANCHOR = { x: 0, y: 0 }.freeze
   ANGLE_ANCHOR = { x: 0.5, y: 0.5 }.freeze
@@ -85,7 +86,7 @@ module RDDR::Spriteable
 
   # from min to max, proportional to sprite_scale relative to SPRITE_SCALES
   def mass
-    return 1 if self.class::SPRITE_SCALES.nil?
+    return self.class::FIXED_MASS if self.class::SPRITE_SCALES.nil?
 
     @mass ||=
       begin
