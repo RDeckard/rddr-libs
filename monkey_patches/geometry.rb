@@ -46,7 +46,7 @@ module RDDR::Geometry
 
   # Find all collisions of rect (or anything responding to #rect) or objects (need a block)
   # Give an optional radius_ratio if you want to use a circle instead of a rect (proportionally to the sum of rect larger sides)
-  def find_all_collisions(*objects, radius_ratio: false)
+  def find_all_collisions(*objects, radius_ratio: nil)
     objects = objects.flatten # and not #flatten! because we want to duplicate the array
     collisions = []
 

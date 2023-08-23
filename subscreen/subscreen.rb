@@ -6,7 +6,7 @@ class RDDR::Subscreen < RDDR::GTKObject
 
   attr_reader :x, :y, :w, :h, :buffer_name, :target, :entities, :world_grid
 
-  def initialize(buffer_name, x: nil, y: nil, w: grid.w, h: grid.h, target: nil, scale_world_grid: 1)
+  def initialize(buffer_name, x: nil, y: nil, w: grid.w, h: grid.h, target: nil, world_grid_scale: 1)
     @buffer_name = buffer_name
 
     @w = w
@@ -17,7 +17,15 @@ class RDDR::Subscreen < RDDR::GTKObject
     @target = target
 
     @entities = Hash.new { |h, k| h[k] = [] }
-    @world_grid = camera.world_viewport.scale_rect(scale_world_grid, 0.5)
+
+    @world_grid =
+      camera # initialize camera
+      .world_viewport
+      .scale_rect_extended(
+        percentage_x: world_grid_scale.is_a?(Hash) ? world_grid_scale.x : world_grid_scale,
+        percentage_y: world_grid_scale.is_a?(Hash) ? world_grid_scale.y : world_grid_scale,
+        anchor_x: 0.5, anchor_y: 0.5
+      )
 
     @initial_rect = rect.dup
 
