@@ -27,16 +27,17 @@ class RDDR::Subscreen < RDDR::GTKObject
       @trauma = 0 if @trauma < 0.01
 
       @rect.merge!(
-        x: @x + @x_offset,
-        y: @y + @y_offset,
+        x: @x_base + @x_offset,
+        y: @y_base + @y_offset,
         angle: @angle,
-        path: @buffer_name,
       )
     end
 
     def init_shaking!
       @trauma = 0
       @angle = 0
+      @x_base = @rect.x
+      @y_base = @rect.y
       @x_offset = 0
       @y_offset = 0
     end

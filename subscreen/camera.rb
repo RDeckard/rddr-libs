@@ -21,11 +21,13 @@ class RDDR::Subscreen
 
     def x=(value)
       @x = value
+
       @center = nil
     end
 
     def y=(value)
       @y = value
+
       @center = nil
     end
 

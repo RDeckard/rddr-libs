@@ -5,7 +5,7 @@ class RDDR::Subscreen < RDDR::GTKObject
 
     def start_resizing!(targeted_rect)
       @start_rect = rect.dup
-      @targeted_rect = targeted_rect.dup
+      @targeted_rect = targeted_rect.to_hash.slice(:x, :y, :w, :h)
 
       @start_time = state.tick_count
     end
@@ -19,17 +19,16 @@ class RDDR::Subscreen < RDDR::GTKObject
                                           EASE_TYPE
 
       if current_progress >= 1
-        self.rect = @targeted_rect
+        self.rect.merge!(**@targeted_rect)
 
         @start_time = @start_rect = @targeted_rect = nil
       else
-        self.rect =
-          {
-            x: @start_rect.x + (@targeted_rect.x - @start_rect.x) * current_progress,
-            y: @start_rect.y + (@targeted_rect.y - @start_rect.y) * current_progress,
-            w: @start_rect.w + (@targeted_rect.w - @start_rect.w) * current_progress,
-            h: @start_rect.h + (@targeted_rect.h - @start_rect.h) * current_progress,
-          }
+        self.rect.merge!(
+          x: @start_rect.x + (@targeted_rect.x - @start_rect.x) * current_progress,
+          y: @start_rect.y + (@targeted_rect.y - @start_rect.y) * current_progress,
+          w: @start_rect.w + (@targeted_rect.w - @start_rect.w) * current_progress,
+          h: @start_rect.h + (@targeted_rect.h - @start_rect.h) * current_progress,
+        )
       end
     end
   end

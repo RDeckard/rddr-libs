@@ -4,15 +4,18 @@ class RDDR::Subscreen < RDDR::GTKObject
 
   EXCLUDED_ATTRIBUTES_FROM_SERIALIZATION = %i[entities].freeze
 
-  attr_reader :x, :y, :w, :h, :buffer_name, :target, :entities, :world_grid
+  attr_accessor :rect
+  attr_reader :buffer_name, :target, :entities, :world_grid
 
-  def initialize(buffer_name, x: nil, y: nil, w: grid.w, h: grid.h, target: nil, world_grid_scale: 1)
+  def initialize(buffer_name, rect: {}, target: nil, world_grid_scale: 1)
     @buffer_name = buffer_name
 
-    @w = w
-    @h = h
-    x ? @x = x : center!(:horizontal)
-    y ? @y = y : center!(:vertical)
+    @rect = rect
+
+    @rect.w = grid.w     unless @rect.w
+    @rect.h = grid.h     unless @rect.h
+    center!(:horizontal) unless @rect.x
+    center!(:vertical)   unless @rect.y
 
     @target = target
 
@@ -27,7 +30,7 @@ class RDDR::Subscreen < RDDR::GTKObject
         anchor_x: 0.5, anchor_y: 0.5
       )
 
-    @initial_rect = rect.dup
+    @initial_rect = @rect.dup
 
     init_shaking!
 
@@ -39,60 +42,50 @@ class RDDR::Subscreen < RDDR::GTKObject
     state.render_targets.uniq!
   end
 
-  def rect
-    @rect ||= { x: @x, y: @y, w: @w, h: @h }
-  end
-
-  def rect=(new_rect)
-    @x = new_rect.x
-    @y = new_rect.y
-    @w = new_rect.w
-    @h = new_rect.h
-
-    @rect = nil
-    @half_w = nil
-    @half_h = nil
-  end
-
   def half_w
-    @half_w ||= @w / 2
+    @rect.w / 2
   end
 
   def half_h
-    @half_h ||= @h / 2
+    @rect.h / 2
+  end
+
+  def x
+    @rect.x
+  end
+
+  def y
+    @rect.y
+  end
+
+  def w
+    @rect.w
+  end
+
+  def h
+    @rect.h
   end
 
   def x=(value)
-    @x = value
-
-    @rect = nil
+    @rect.x = value
   end
 
   def y=(value)
-    @y = value
-
-    @rect = nil
+    @rect.y = value
   end
 
   def w=(value)
-    render_target.w = @w = value
+    render_target.w = @rect.w = value
 
-    @rect = nil
-    @half_w = nil
   end
 
   def h=(value)
-    render_target.h = @h = value
-
-    @rect = nil
-    @half_h = nil
+    render_target.h = @rect.h = value
   end
 
   def center!(option = :both)
-    @x = (grid.w - @w) / 2 if option == :horizontal
-    @y = (grid.h - @h) / 2 if option == :vertical
-
-    @rect = nil
+    @rect.x = (grid.w - @rect.w) / 2 if option == :horizontal
+    @rect.y = (grid.h - @rect.h) / 2 if option == :vertical
   end
 
   def camera
@@ -100,7 +93,7 @@ class RDDR::Subscreen < RDDR::GTKObject
   end
 
   def world_viewport
-    from_grid_to_world_space(rect)
+    from_grid_to_world_space(@rect)
   end
 
   def random_world_point
@@ -148,8 +141,8 @@ class RDDR::Subscreen < RDDR::GTKObject
     subscreen_rect_w = grid_rect.w || 0
     subscreen_rect_h = grid_rect.h || 0
 
-    subscreen_rect_x = subscreen_rect_x - @x
-    subscreen_rect_y = subscreen_rect_y - @y
+    subscreen_rect_x = subscreen_rect_x - @rect.x
+    subscreen_rect_y = subscreen_rect_y - @rect.y
     subscreen_rect_w = subscreen_rect_w
     subscreen_rect_h = subscreen_rect_h
 
@@ -162,8 +155,8 @@ class RDDR::Subscreen < RDDR::GTKObject
     grid_rect_w = subscreen_rect.w || 0
     grid_rect_h = subscreen_rect.h || 0
 
-    grid_rect_x = grid_rect_x + @x
-    grid_rect_y = grid_rect_y + @y
+    grid_rect_x = grid_rect_x + @rect.x
+    grid_rect_y = grid_rect_y + @rect.y
     grid_rect_w = grid_rect_w
     grid_rect_h = grid_rect_h
 
@@ -187,11 +180,11 @@ class RDDR::Subscreen < RDDR::GTKObject
   end
 
   def fullscreen?
-    rect.values_at(:x, :y, :w, :h) == grid.rect
+    @rect.values_at(:x, :y, :w, :h) == grid.rect
   end
 
   def toggle_fullscreen!
-    start_resizing!(fullscreen? ? @initial_rect : grid)
+    start_resizing!(fullscreen? ? @initial_rect : grid.rect)
   end
 
   def render_target
@@ -202,8 +195,8 @@ class RDDR::Subscreen < RDDR::GTKObject
     return if state.tick_count == @last_prerender
 
     render_target.transient!
-    render_target.w = @w
-    render_target.h = @h
+    render_target.w = @rect.w
+    render_target.h = @rect.h
 
     shaking!
     easing_resize!
@@ -214,7 +207,7 @@ class RDDR::Subscreen < RDDR::GTKObject
   def buffer
     pre_render
 
-    { **rect, path: @buffer_name }
+    { **@rect, path: @buffer_name }
   end
 
   def render
