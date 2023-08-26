@@ -9,7 +9,7 @@ class RDDR::Tick < RDDR::GTKObject
     current_scene.tick
 
     debug! if state.rddr_debug_mode
-    handle_quit_and_reset
+    handle_inputs
   end
 
   def change_scene!(scene_class)
@@ -17,7 +17,7 @@ class RDDR::Tick < RDDR::GTKObject
     current_scene.init
   end
 
-  def handle_quit_and_reset
+  def handle_inputs
     if inputs.keyboard.key_held.alt && inputs.keyboard.key_down.f
       state.window_fullscreen = !state.window_fullscreen
       gtk.set_window_fullscreen(state.window_fullscreen)
@@ -32,10 +32,21 @@ class RDDR::Tick < RDDR::GTKObject
 
     gtk.reset if inputs.keyboard.key_held.alt && inputs.keyboard.key_down.r
     state.rddr_debug_mode = !state.rddr_debug_mode if inputs.keyboard.key_held.alt && inputs.keyboard.key_down.d
+
+    return unless state.rddr_debug_mode
+
+    keys_down = inputs.keyboard.keys.down
+    @keys_down = keys_down if keys_down.any?
+    outputs.debug << {
+      x: grid.left.shift_right(5), y: grid.top.shift_down(30),
+      text: @keys_down,
+      size_enum: 2,
+      r: 255, g: 0, b: 0,
+    }.label!
   end
 
   def debug!
-    @tabulation = " " * 16
+    @tabulation ||= " " * 16
     @output_counter ||=
       lambda { |objects|
         objects.flatten!

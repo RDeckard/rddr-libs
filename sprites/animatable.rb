@@ -50,12 +50,12 @@ module RDDR::Animatable
     @frames_collection_name = frames_collection_name unless frames_collection_name.nil?
 
     @frames_per_collection = if self.class::FRAMES_PER_COLLECTION.is_a?(Hash)
-                               self.class::FRAMES_PER_COLLECTION[@frames_collection_name]
+                               self.class::FRAMES_PER_COLLECTION.fetch(@frames_collection_name)
                              else
                                self.class::FRAMES_PER_COLLECTION
                              end
 
-    @frames_collection_index = self.class::FRAMES_COLLECTIONS[@frames_collection_name]
+    @frames_collection_index = self.class::FRAMES_COLLECTIONS.fetch(@frames_collection_name)
   end
 
   def start_animation!(
