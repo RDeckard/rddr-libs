@@ -3,7 +3,7 @@ class RDDR::StaticBuffer < RDDR::GTKObject
 
   def initialize(buffer_name, rect)
     @buffer_name = buffer_name
-    @rect = rect.dup
+    @rect = rect.dup.sprite!(path: @buffer_name)
 
     outputs[@buffer_name].w = @rect.w
     outputs[@buffer_name].h = @rect.h
@@ -11,11 +11,18 @@ class RDDR::StaticBuffer < RDDR::GTKObject
   end
 
   # Pass a optional block to adapt the buffer.rect to render_target where the buffer will be rendered
-  def as_sprite
+  def as_sprite(object_to_follow: nil, parallax: 1)
+    if object_to_follow
+      @rect.merge!(
+        x: object_to_follow.x * (1 - parallax),
+        y: object_to_follow.y * (1 - parallax),
+      )
+    end
+
     if block_given?
       yield(@rect)
     else
       @rect
-    end.sprite!(path: @buffer_name)
+    end
   end
 end
