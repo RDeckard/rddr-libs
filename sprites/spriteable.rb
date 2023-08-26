@@ -4,7 +4,7 @@ module RDDR::Spriteable
   DEFAULT_SPRITE = "pixel"
 
   SPRITE_PATH = nil # optional, fallback to #sprite_path then DEFAULT_SPRITE
-  SPRITE_SCALE = 1.0 # optional, fallback to #sprite_scale then 1.0
+  SPRITE_SCALE = 1.0 # optional, fallback to #sprite_scale then 1.0. Can also be a Hash with :x and :y keys.
   SPRITE_WIDTH = nil # optional, fallback to #sprite_width then SPRITE_SIZE
   SPRITE_HEIGHT = nil # optional, fallback to #sprite_height then SPRITE_SIZE
 
@@ -20,8 +20,9 @@ module RDDR::Spriteable
   FLIP_VERTICALLY = false
 
   VISIBLE = true
+  ALPHA = 255
 
-  attr_accessor :x, :y, :w, :h, :sprite_width, :sprite_height, :flip_horizontally, :flip_vertically
+  attr_accessor :x, :y, :w, :h, :sprite_width, :sprite_height, :flip_horizontally, :flip_vertically, :alpha
   attr_reader :angle, :sprite_scale
   attr_writer :sprite_path, :visible
 
@@ -34,6 +35,7 @@ module RDDR::Spriteable
     flip_horizontally: self.class::FLIP_HORIZONTALLY,
     flip_vertically: self.class::FLIP_VERTICALLY,
     visible: self.class::VISIBLE,
+    alpha: self.class::ALPHA,
     **kwargs
   )
     @angle = angle
@@ -41,17 +43,19 @@ module RDDR::Spriteable
     @sprite_path = sprite_path
     @sprite_width = sprite_width
     @sprite_height = sprite_height
-    @sprite_scale = sprite_scale
-    mass # trigger calculation
+    self.sprite_scale = sprite_scale
 
     set_flips(flip_horizontally, flip_vertically)
 
     @visible = visible
-
-    @w = @sprite_width * @sprite_scale
-    @h = @sprite_height * @sprite_scale
+    @alpha = alpha
 
     super(**kwargs)
+  end
+
+  def set_width_and_height
+    @w = @sprite_width * @sprite_scale.x
+    @h = @sprite_height * @sprite_scale.y
   end
 
   def set_flips(flip_horizontally, flip_vertically)
@@ -79,9 +83,15 @@ module RDDR::Spriteable
   end
 
   def sprite_scale=(value)
-    @sprite_scale = value
+    @sprite_scale = if value.is_a?(Hash)
+                      value.merge(avg: (value.x + value.y) / 2)
+                    else
+                      { x: value, y: value, avg: value }
+                    end
 
+    set_width_and_height unless @sprite_width.nil? || @sprite_height.nil?
     @mass = nil
+    mass # trigger calculation
   end
 
   # from min to max, proportional to sprite_scale relative to SPRITE_SCALES
@@ -91,7 +101,7 @@ module RDDR::Spriteable
     @mass ||=
       begin
         min_scale, max_scale = self.class::SPRITE_SCALES.minmax
-        ratio = (sprite_scale - min_scale) / (max_scale - min_scale)
+        ratio = (@sprite_scale.avg - min_scale) / (max_scale - min_scale)
 
         (
           self.class::MASS_MIN * (1 - ratio) + ratio * self.class::MASS_MAX
@@ -102,6 +112,14 @@ module RDDR::Spriteable
   # Can be overriden by subclasses
   def sprite_path
     @sprite_path ||= DEFAULT_SPRITE
+  end
+
+  def visible!
+    @visible = true
+  end
+
+  def invisible!
+    @visible = false
   end
 
   def visible?
@@ -115,8 +133,7 @@ module RDDR::Spriteable
   def rect
     {
       x: x, y: y, w: sprite_width, h: sprite_height,
-      anchor_x: anchor.x, anchor_y: anchor.y
-    }.scale_rect(sprite_scale)
+    }.scale_rect_extended(percentage_x: sprite_scale.x, percentage_y: sprite_scale.y)
   end
 
   # Warning: this matches well only with square rotated sprites (even with after_rotation == true)
@@ -217,7 +234,7 @@ module RDDR::Spriteable
       params[:x], params[:y],
       params[:w], params[:h],
       params[:path] || sprite_path, params[:angle] || angle,
-      params[:alpha], params[:r], params[:g], params[:b],
+      params[:alpha] || alpha, params[:r], params[:g], params[:b],
       params[:tile_x], params[:tile_y], params[:tile_w], params[:tile_h],
       params[:flip_horizontally] || @flip_h, params[:flip_vertically] || @flip_v,
       params[:angle_anchor_x] || angle_anchor.x, params[:angle_anchor_y] || angle_anchor.y,
