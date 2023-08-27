@@ -44,7 +44,7 @@ class RDDR::Prompt < RDDR::GTKObject
 
       unless @render_in_disable_state
         @field_lines =
-          RDDR.wrapped_lines("#{@title} #{@value}", @max_chars_by_line - 1, keep_last_spaces: true)
+          RDDR.wrapped_lines("#{@title} #{@value}", @max_chars_by_line - 1, rstrip: false)
 
         @updated_labels << [
           @field_lines.map.with_index do |field_line, line_number|

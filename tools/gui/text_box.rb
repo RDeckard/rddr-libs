@@ -1,15 +1,16 @@
 class RDDR::TextBox < RDDR::GTKObject
   attr_reader :text_lines
 
-  def initialize(text_lines, text_size: 0, container_rect: grid.rect, box_alignment: :center, box_alignment_v: :center, text_alignment: :left, text_offset: 5, box_offset: 5, max_width: nil, box_x: nil, box_y: nil, invisible_box: false)
+  def initialize(text_lines, text_size: 0, text_color: RDDR.color(:white), text_alignment: :left, text_offset: 5, box_offset: 5, container_rect: grid.rect, box_alignment: :center, box_alignment_v: :center, max_width: nil, box_x: nil, box_y: nil, invisible_box: false)
     @text_lines      = (text_lines.is_a?(String) ? text_lines.split("\n") : text_lines).flatten
     @text_size       = text_size
-    @container_rect  = container_rect
-    @box_alignment   = box_alignment
-    @box_alignment_v = box_alignment_v
+    @text_color      = text_color
     @text_alignment  = text_alignment
     @text_offset     = text_offset
     @box_offset      = box_offset
+    @container_rect  = container_rect
+    @box_alignment   = box_alignment
+    @box_alignment_v = box_alignment_v
     @max_width       = max_width || container_rect.w
     @box_x           = box_x
     @box_y           = box_y
@@ -57,7 +58,7 @@ class RDDR::TextBox < RDDR::GTKObject
         text: text,
         size_enum: @text_size,
         alignment_enum: %i[left center right].index(@text_alignment),
-        r: 255, g: 255, b: 255
+        **@text_color,
       }.label!
     end
 
@@ -71,7 +72,7 @@ class RDDR::TextBox < RDDR::GTKObject
       line_w += 2*@text_offset
       box_w = line_w + 2*@box_offset > @max_width ? @max_width - 2*@box_offset : line_w
 
-      max_chars_by_line = (box_w/line_w * longest_text_line.size).to_i
+      max_chars_by_line = (box_w/line_w * longest_text_line.size + 1).to_i
 
       @text_lines = RDDR.wrapped_lines(@text_lines, max_chars_by_line)
 

@@ -4,11 +4,11 @@ module RDDR
 
   extend self
 
-  def wrapped_lines(text_lines, max_chars_by_line, keep_last_spaces: false)
+  def wrapped_lines(text_lines, max_chars_by_line, rstrip: true)
     Array(text_lines).flat_map do |text_line|
       $gtk.args.string.wrapped_lines(text_line, max_chars_by_line).
         tap do |wrapped_text_lines|
-          next unless keep_last_spaces
+          next unless rstrip
 
           wrapped_text_lines.last << SPACE while text_line.delete_suffix!(" ")
         end.presence || NEW_LINE
