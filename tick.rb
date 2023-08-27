@@ -8,6 +8,8 @@ class RDDR::Tick < RDDR::GTKObject
   def call
     current_scene.tick
 
+    RDDR::Timer.tick! unless RDDR::Timer.tick_pause?
+
     debug! if state.rddr_debug_mode
     handle_inputs
   end
