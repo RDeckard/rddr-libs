@@ -15,9 +15,9 @@ require "lib/rddr-libs/sprites/animatable.rb"
 require "lib/rddr-libs/sprites/spriteable.rb"
 
 # Tools
+require "lib/rddr-libs/tools/gui/colors.rb"
 require "lib/rddr-libs/tools/gui/box.rb"
 require "lib/rddr-libs/tools/gui/button.rb"
-require "lib/rddr-libs/tools/gui/colors.rb"
 require "lib/rddr-libs/tools/gui/text_inputs.rb"
 require "lib/rddr-libs/tools/gui/prompt.rb"
 require "lib/rddr-libs/tools/gui/slider.rb"

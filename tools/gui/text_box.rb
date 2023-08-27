@@ -1,7 +1,10 @@
 class RDDR::TextBox < RDDR::GTKObject
   attr_reader :text_lines
 
-  def initialize(text_lines, text_size: 0, text_color: RDDR.color(:white), text_alignment: :left, text_offset: 5, box_offset: 5, container_rect: grid.rect, box_alignment: :center, box_alignment_v: :center, max_width: nil, box_x: nil, box_y: nil, invisible_box: false)
+  DEFAULT_COLOR = RDDR.color(:black).merge!(a: 255).freeze
+  DEFAULT_BOX_KWARGS = { background_color: :black }.freeze
+
+  def initialize(text_lines, text_size: 0, text_color: %i[classic white], text_alignment: :left, text_offset: 5, box_offset: 5, container_rect: grid.rect, box_alignment: :center, box_alignment_v: :center, max_width: nil, box_x: nil, box_y: nil, box_kwargs: {}, invisible_box: false)
     @text_lines      = (text_lines.is_a?(String) ? text_lines.split("\n") : text_lines).flatten
     @text_size       = text_size
     @text_color      = text_color
@@ -14,7 +17,15 @@ class RDDR::TextBox < RDDR::GTKObject
     @max_width       = max_width || container_rect.w
     @box_x           = box_x
     @box_y           = box_y
+    @box_kwargs      = box_kwargs
     @invisible_box   = invisible_box || false
+
+    @text_color =
+      if @text_color.is_a?(Hash)
+        DEFAULT_COLOR.merge(@text_color)
+      else
+        RDDR.color(@text_color)
+      end
 
     yield(self) if block_given?
 
@@ -42,7 +53,9 @@ class RDDR::TextBox < RDDR::GTKObject
       when :bottom then @container_rect.bottom.shift_up(@box_offset)
       end
 
-    @primitives << RDDR::Box.new(rect, background_color: :black).primitives unless @invisible_box
+    unless @invisible_box
+      @primitives << RDDR::Box.new(rect, DEFAULT_BOX_KWARGS.merge(**@box_kwargs)).primitives
+    end
 
     @primitives << @text_lines.map.with_index do |text, index|
       x =

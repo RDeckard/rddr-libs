@@ -1,7 +1,7 @@
 class RDDR::Box < RDDR::GTKObject
   include RDDR::Spriteable
 
-  DEFAULT_COLOR = { r: 0, g: 0, b: 0, a: 255 }.freeze
+  DEFAULT_COLOR = RDDR.color(:black).merge!(a: 255).freeze
 
   attr_reader :rect, :border_thickness, :background_color, :border_color, :sprite_path, :angle, :invisible
 
