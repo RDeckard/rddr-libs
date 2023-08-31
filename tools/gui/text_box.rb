@@ -85,7 +85,12 @@ class RDDR::TextBox < RDDR::GTKObject
       line_w += 2*@text_offset
       box_w = line_w + 2*@box_offset > @max_width ? @max_width - 2*@box_offset : line_w
 
-      max_chars_by_line = (box_w/line_w * longest_text_line.size + 1).to_i
+      max_chars_by_line =
+        if line_w.positive?
+          (box_w/line_w * longest_text_line.size + 1).to_i
+        else
+          0
+        end
 
       @text_lines = RDDR.wrapped_lines(@text_lines, max_chars_by_line)
 
