@@ -133,7 +133,11 @@ module RDDR::Spriteable
   def rect
     {
       x: x, y: y, w: sprite_width, h: sprite_height,
-    }.scale_rect_extended(percentage_x: sprite_scale.x, percentage_y: sprite_scale.y)
+      anchor_x: anchor.x, anchor_y: anchor.y,
+    }.scale_rect_extended(
+      percentage_x: sprite_scale.x, percentage_y: sprite_scale.y,
+      anchor_x: 0, anchor_y: 0,
+    )
   end
 
   # Warning: this matches well only with square rotated sprites (even with after_rotation == true)
