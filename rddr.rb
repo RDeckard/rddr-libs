@@ -34,4 +34,20 @@ module RDDR
       RDDR::Colors::SETS.dig(*second_color).dup
     end
   end
+
+  def debug_mode?
+    $gtk.args.state.rddr_debug_mode
+  end
+
+  def start_debug_mode!
+    $gtk.args.state.rddr_debug_mode = true
+  end
+
+  def stop_debug_mode!
+    $gtk.args.state.rddr_debug_mode = false
+  end
+
+  def toggle_debug_mode!
+    $gtk.args.state.rddr_debug_mode = !$gtk.args.state.rddr_debug_mode
+  end
 end

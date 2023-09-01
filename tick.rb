@@ -10,7 +10,7 @@ class RDDR::Tick < RDDR::GTKObject
 
     RDDR::Timer.tick! unless RDDR::Timer.tick_pause?
 
-    debug! if state.rddr_debug_mode
+    render_debug if RDDR.debug_mode?
     handle_inputs
   end
 
@@ -33,9 +33,9 @@ class RDDR::Tick < RDDR::GTKObject
     return if gtk.production?
 
     gtk.reset if inputs.keyboard.key_held.alt && inputs.keyboard.key_down.r
-    state.rddr_debug_mode = !state.rddr_debug_mode if inputs.keyboard.key_held.alt && inputs.keyboard.key_down.d
+    RDDR.toggle_debug_mode! if inputs.keyboard.key_held.alt && inputs.keyboard.key_down.d
 
-    return unless state.rddr_debug_mode
+    return unless RDDR.debug_mode?
 
     keys_down = inputs.keyboard.keys.down
     @keys_down = keys_down if keys_down.any?
@@ -47,7 +47,7 @@ class RDDR::Tick < RDDR::GTKObject
     }.label!
   end
 
-  def debug!
+  def render_debug
     @tabulation ||= " " * 16
     @output_counter ||=
       lambda { |objects|

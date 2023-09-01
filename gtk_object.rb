@@ -35,7 +35,7 @@ class RDDR::GTKObject
     end
 
     def debug_puts(...)
-      return unless state.rddr_debug_mode
+      return unless RDDR.debug_mode?
 
       puts(...)
     end
