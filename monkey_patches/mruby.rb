@@ -62,6 +62,14 @@ class String
     dup
   end
 
+  def squish
+    dup.tap(&:squish!)
+  end
+
+  def squish!
+    tr!("\n", " ").tap { _1.squeeze!(" ") }.tap { _1.strip! }
+  end
+
   # mruby lacks Regexp
   def underscore
     return "" if blank?
