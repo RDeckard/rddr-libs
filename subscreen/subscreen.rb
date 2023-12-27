@@ -84,8 +84,8 @@ class RDDR::Subscreen < RDDR::GTKObject
   end
 
   def center!(option = :both)
-    @rect.x = (grid.w - @rect.w) / 2 if option == :horizontal
-    @rect.y = (grid.h - @rect.h) / 2 if option == :vertical
+    @rect.x = (grid.w - @rect.w) / 2 if option == :both || option == :horizontal
+    @rect.y = (grid.h - @rect.h) / 2 if option == :both || option == :vertical
   end
 
   def camera
